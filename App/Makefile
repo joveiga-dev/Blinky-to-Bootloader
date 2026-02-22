@@ -1,63 +1,128 @@
+#--------------------------------------------------------------------------------
+# Toolchain
+#---------------------------------------------------------------------------------
+TC = arm-none-eabi-
+CC = $(TC)gcc
+LD = $(TC)ld
+OBJCOPY = $(TC)objcopy
+OBJDUMP = $(TC)objdump
+SIZE = $(TC)size
+
+# CPU and architecture flags
+CPU = -mcpu=cortex-m4
+FLOAT=-mfloat-abi=soft
+
+#--------------------------------------------------------------------
+# Target
+#-------------------------------------------------------------------
+PROJECT = firmware
+TARGET = $(PROJECT).elf
+BIN = $(PROJECT).bin
+HEX = $(PROJECT).hex
+MAP = $(PROJECT).map
+ROOT_DIR = ..
+BUILD_DIR = $(ROOT_DIR)/Build
+STM32PROGRAMMER_CLI = "/mnt/c/Program Files (x86)/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin/STM32_Programmer_CLI.exe"
+
+LINKER = -T $(ROOT_DIR)/Linkers/linker.ld
+MAP_FILE = -Wl,-Map=$(BUILD_DIR)/$(MAP)
+
+#-------------------------------------------------------------------
+# Flags
+#------------------------------------------------------------------
+CFLAGS = $(CPU)
+CFLAGS += -mthumb $(FLOAT)
+CFLAGS += -Wall -Wextra -Werror
+CFLAGS += -O0 -g 
+CFLAGS += -ffreestanding -nostdlib -nostartfiles
+CFLAGS += -fno-common -ffunction-sections -fdata-sections
+
+LDFLAGS =  $(CPU) -mthumb $(FLOAT) --specs=nosys.specs  $(LINKER) $(MAP_FILE) -g \
+			-Wl,--gc-sections -static --specs=nano.specs -Wl,--start-group -lc -lm -Wl,--end-group \
+ 			-Wl,--print-memory-usage
+
+#-----------------------------------------------
+# Inludes
+#--------------------------------------------
+INCLUDES = -I$(ROOT_DIR)/App/Inc
+INCLUDES += -I$(ROOT_DIR)/Drivers/Inc
+INCLUDES += -I$(ROOT_DIR)/Common/Inc
+
+#---------------------------------------
+# Source Files discovery recursively
+#-----------------------------------
+APP_SRC := $(wildcard $(ROOT_DIR)/App/Src/*.c)
+DRIVERS_SRC := $(wildcard $(ROOT_DIR)/Drivers/Src/*.c)
+COMMON_SRC := $(wildcard $(ROOT_DIR)/Common/Src/*.c)
+SOURCES := $(APP_SRC) $(DRIVERS_SRC) $(COMMON_SRC)
+
+#---------------------------------------------------------------------------------
+# Object files (mirrored into Build)
+#---------------------------------------------------------------------------------
+OBJECTS := $(patsubst $(ROOT_DIR)/%, $(BUILD_DIR)/%, $(SOURCES:.c=.o))
+
+#---------------------------------------------------------------------------------
+# Default target
+#---------------------------------------------------------------------------------
+all: $(BUILD_DIR)/$(TARGET) $(BUILD_DIR)/$(BIN) size
 
 
-SRC_DIR := Src
-BUILD_DIR := Build
+# Ensure build directories exist
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
 
-TARGET := firmware
+# ---------------------------------------------------------------------
+# Compile rules (C)
+# ---------------------------------------------------------------------
+$(BUILD_DIR)/%.o: $(ROOT_DIR)/%.c | $(BUILD_DIR)
+	@mkdir -p $(dir $@)
+	@echo "Compiling $<"
+	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
-LINKER := -T linker.ld
+# ---------------------------------------------------------------------
+# Linking
+# ---------------------------------------------------------------------
+$(BUILD_DIR)/$(TARGET): $(OBJECTS) | $(BUILD_DIR)
+	@echo "Linking $@"
+	$(CC) $(LDFLAGS) -o $@ $^
+#	@echo "Generating BIN"
+#	$(OBJCOPY) -O binary $@ $(BUILD_DIR)/$(BIN)
+#	@echo "Size:"
+#	$(SIZE) $@
 
-# Tools
-TC := arm-none-eabi
-CC := $(TC)-gcc
-OBJCPY := $(TC)-objcopy
-GDB := $(TC)-gdb
+#----------------------------------------------------------------------
+# BIN
+#----------------------------------------------------------------------
+$(BUILD_DIR)/$(BIN): $(BUILD_DIR)/$(TARGET)
+	@echo "Generating BIN"
+	$(OBJCOPY) -O binary $< $@
 
-# CPU / ARCH
-CPU := -mcpu=cortex-m4
-FLOAT := -mfloat-abi=soft
-# FLAGS
-CFLAGS := $(CPU) -mthumb $(FLOAT) -o0 -g -Wall
-LDFLAGS := $(LINKER) -nostdlib
+size: $(BUILD_DIR)/$(TARGET)
+	@echo ""
+	@echo "=== Size Information ==="
+	@$(SIZE) $<
+	@echo ""
+	@echo "=== Memory Usage ==="
+	@SIZE=$$($(SIZE) -B $< | tail -1 | awk '{print $$1+$$2}'); \
+	echo "Total (text+data): $$SIZE bytes"; \
+	echo "Available SRAM: 65536 bytes (64KB)"; \
+	PERCENT=$$(echo "scale=1; $$SIZE * 100 / 65536" | bc); \
+	echo "Usage: $$PERCENT%"
 
-# Find C source files recursively
-SOURCES := $(shell find $(SRC_DIR) -type f -name '*.c')
+# ---------------------------------------------------------------------
+# Flashing targets
+# ---------------------------------------------------------------------
+flash:
+	$(STM32PROGRAMMER_CLI) -c port=SWD mode=UR -w $(BUILD_DIR)/$(PROJECT).bin 0x08000000 -rst
 
-# Generate object file names based on source file names
-OBJECTS := $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(SOURCES))
+dfu:
+	dfu-util -a 0 -s 0x08000000:leave -D $(BUILD_DIR)/$(PROJECT).bin
 
-.PHONY: all clean flash debug gdb
-
-all: $(BUILD_DIR)/$(TARGET).bin
-
-# Compile to ELF
-$(BUILD_DIR)/$(TARGET).elf: $(OBJECTS)
-	$(CC) $(OBJECTS) $(LDFLAGS) -o $@
-
-# Convert ELF to BIN
-$(BUILD_DIR)/$(TARGET).bin: $(BUILD_DIR)/$(TARGET).elf
-	$(OBJCPY) -O binary $< $@
-
-# compile each source
-$(BUILD_DIR)/%.o : $(SRC_DIR)/%.c
-	@mkdir -p $(@D)
-	$(CC) $(CFLAGS) -c $< -o $@
-
-# Flash target
-flash: $(BUILD_DIR)/$(TARGET).bin
-	@echo "Flashing firmware via ST-LINK GDB server..."
-	"/mnt/c/Program Files (x86)/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin/STM32_Programmer_CLI.exe" \
-	-c port=SWD mode=UR -w $< 0x08000000 -rst
-	
-# Debug helper
-debug: $(BUILD_DIR)/$(TARGET).elf
-	@echo "Starting OpenOCD..."
-	@openocd -f openocd.cfg &
-	sleep 1
-	$(GDB) $< -ex "target remote localhost:61234" -ex "monitor reset init"
-
+# ---------------------------------------------------------------------
+# Clean
+# ---------------------------------------------------------------------
 clean:
-	rm -rf $(BUILD_DIR)
+	@echo "Cleaning build directory..."
+	@rm -rf $(BUILD_DIR)/*.o $(BUILD_DIR)/*.elf $(BUILD_DIR)/*.bin $(BUILD_DIR)/*.map
 
-
-
+.PHONY: all clean size flash dfu 

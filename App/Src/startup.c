@@ -2,7 +2,9 @@
 
 #define RAM_START       0X20000000U
 #define RAM_SIZE        (96 * 1024) // 96Kbytes
-#define RAM_END         ((RAM_START) + (RAM_SIZE))
+#define RAM_END         ((RAM_START) + (RAM_SIZE))   // 0x20018000
+
+#define STACK_START     (RAM_END)
 
 /* Linker Symbols*/
 extern uint32_t _sbss, _ebss;
@@ -12,15 +14,6 @@ extern uint32_t _etext;
 int main(void);
 void Reset_Handler(void);
 void Default_Handler(void);
-
-
-/* Vector table placed at start of flash */
-__attribute__((section(".vectors"), used))
-void (*vectors[])(void) = {
-    (void(*)(void))RAM_END,  // Initial stack pointer
-    Reset_Handler             // Reset handler
-};
-
 
 void Reset_Handler(void)
 {
@@ -36,13 +29,21 @@ void Reset_Handler(void)
         *p_dst++ = *p_src++;
     }
 
-    main();
+    //__asm volatile("MSR MSP, %0": : "r" (STACK_START): ); // stack reset
 
-    while (1);
+    main();   // Call main
+
+    while (1) (void) 0;   // Infinite loop in case if main() returns
 
 }
 
 void Default_Handler(void) {
     while (1);
 }
+
+__attribute__((section(".vectors"), used))
+void (*vectors[])(void) = {
+    (void(*)(void))STACK_START,   // Initial stack pointer
+    Reset_Handler             // Reset handler
+};
 
