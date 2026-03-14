@@ -22,7 +22,11 @@ MEMORY
 
 /* Sections */
 SECTIONS
-{
+{   /* Interrupt vectors. The first two entries are more special as they old the initial stack pointer and the
+     * initial program counter (Reset Handler).
+     * Mark it as KEEP to prevent it from being garbage collected.
+    */
+
     .vectors :
     {   
         . = ALIGN(4);
@@ -39,8 +43,11 @@ SECTIONS
         _etext = .;   /* Define a gloabl symbol at the end of code section */
     } > FLASH
     
-    /* Initialized data section into RAM*/
-    .data :
+    /* Initialized data section into RAM
+    * During boot, we have to copy from flash to ram at the provided locations.
+    * _sdata and _edata will be used for that
+    */
+    .data : /* AT (_etext) */
     {   
         . = ALIGN(4);
         _sdata = .;   /* Create a global symbol at data start*/
@@ -48,7 +55,7 @@ SECTIONS
         . = ALIGN(4);
         _edata = .;  /* Create a global symbol at data end*/
     } > SRAM AT > FLASH
-
+    
     .bss :
     {
         _sbss = .;
@@ -58,5 +65,8 @@ SECTIONS
         _ebss = .;    /* Define a global symbol at bss end*/
     } > SRAM
 
-    _end = .;             /* For cmsis_gcc.h */
+    _end = .; 
+   
+   /* Create a symbol for the end of ram */
+    _esram = ORIGIN(SRAM) + LENGTH(SRAM);          
 }

@@ -12,29 +12,6 @@
  #include <stdint.h>
  #include <stdbool.h>
 
-/* Memory map for STM32L4 board
-* Section 2.2.2 of the reference manual
-*/
-/* Base Addresses*/
-#define FLASH_BASE                    (0x08000000U)
-#define PERIPH_BASE                   (0x40000000U) // Same as APB1
-
-/* Bus base addresses */
-#define APB1_BASE              (PERIPH_BASE + 0x00000U)
-#define APB2_BASE              (PERIPH_BASE + 0x10000U)
-#define AHB1_BASE              (PERIPH_BASE + 0x20000U)
-#define AHB2_BASE              (0x48000000U)
-
-/* Bus APB1 */
-/* Bus APB2 */
-
-/* AHB1 Peripheral for enabling GPIO clocks*/
-#define RCC_BASE                     (AHB1_BASE + 0x1000U)
-#define RCC_AHB2ENR_OFFSET           (0x4CU)
-/* GPIOA Bank */
-#define GPIOA_BASE                   (AHB2_BASE + 0x0000U)
-#define GPIO_BANK_OFFSET             (0x400U)
-
 typedef struct {
     volatile uint32_t MODER;
     volatile uint32_t OTYPER;   // Output Type Register offset 0x04
@@ -45,7 +22,7 @@ typedef struct {
     volatile uint32_t BSRR;     // Set/Reset Register offset 0x18
     volatile uint32_t LCKR;     // Configuration Lock Register
     volatile uint32_t AFR[2];
-} GPIO_TypeDef;
+} GPIO_RegDef_t;
 
 typedef enum {
     GPIO_BANK_A = 0,
@@ -55,7 +32,9 @@ typedef enum {
     GPIO_BANK_E,
     GPIO_BANK_F,
     GPIO_BANK_G,
-    GPIO_BANK_H
+    GPIO_BANK_H,
+
+    GPIO_BANK_COUNT
 } gpio_bank_t;
 
 typedef enum {
@@ -79,8 +58,8 @@ typedef enum {
 
 typedef enum {
     GPIO_LOW_SPEED = 0,
-    GPIO_MEDIUM_SPEED = 0,
-    GPIO_HIGH_SPEED = 0,
+    GPIO_MEDIUM_SPEED,
+    GPIO_HIGH_SPEED,
     GPIO_VERY_HIGH_SPEED
 } gpio_pin_speed_t;
 
@@ -95,6 +74,8 @@ void gpio_enable_bank(gpio_bank_t bank);
 uint32_t gpio_get_bank_base(gpio_bank_t bank);
 void gpio_mode_set(gpio_bank_t bank, uint8_t pin, gpio_mode_t mode);
 void gpio_pull_set(gpio_bank_t bank, uint8_t pin, gpio_pull_t pull);
+void gpio_speed_set(gpio_bank_t bank, uint8_t pin, gpio_pin_speed_t speed);
+void gpio_alternate_set(gpio_bank_t bank, uint8_t pin, uint8_t alternate_func);
 gpio_mode_t gpio_get_mode(gpio_bank_t bank, uint8_t pin);
 
 /* Digital IO*/
