@@ -1,11 +1,7 @@
 #include <stdint.h>
-#include "driver_gpio.h"
 #include "led.h"
 #include "button.h"
 #include "app.h"
-#include "driver_systick.h"
-#include "stm32l4xx.h"
-#include "driver_uart.h"
 #include <stdio.h>
 
 #define BLINK_INTERVAL_MS   200
