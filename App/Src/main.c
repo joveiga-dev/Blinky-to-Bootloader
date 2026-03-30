@@ -1,11 +1,12 @@
 
-#include "app.h"
+#include "App.h"
 
 int main(void) {
-    app_init();
+
+    App_Init();
 
     while(1) {
-        app_task();
+        App_Task();
     }
 
     return 0;

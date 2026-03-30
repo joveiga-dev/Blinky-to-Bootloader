@@ -1,24 +1,45 @@
 #ifndef __BUTTON_H__
 #define __BUTTON_H__
 
-#include <stdint.h>
+#include "Gpio.h"
+
 #include <stdbool.h>
-#include "driver_gpio.h"
 
 /* STM32 User Button Definition */
-#define USER_BUTTON1_BANK        GPIO_BANK_C
-#define USER_BUTTON1_PIN         13
+#define USER_BUTTON1_BANK        GPIOC
+#define USER_BUTTON1_PIN         GPIO_PIN_13
 
 typedef enum {
-    BUTTON_RELEASED = 0,
-    BUTTON_PRESSED,
-    BUTTON_UNKNOWN
-} button_state_t;
+    BTN1 = 0,
+    BTN2,
+    BTN_COUNT
+} Btn_Id_t;
+
+typedef enum {
+    BTN_ACTIVE_HIGH = 0,
+    BTN_ACTIVE_LOW
+} Btn_Active_t;
+
+typedef enum {
+    BTN_RELEASED = 0,
+    BTN_PRESSED,
+    BTN_UNKNOWN
+} Btn_State_t;
+
+// Button interface application
+typedef struct {
+    GPIO_RegDef_t * Gpiox;
+    uint8_t pin;
+    Btn_Active_t active_state;
+    bool last_state;
+    bool current_state;
+} Btn_t;
 
 
 /* User Button api */
-void user_button_init(void);
-button_state_t user_button_read(void);
+void Btn_Init(Btn_Id_t Btnx);
+Btn_State_t Btn_Read(Btn_Id_t Btnx);
+bool Btn_read(Btn_Id_t Btnx);
+bool Btn_Pressed(Btn_Id_t Btnx);
 
-
-#endif /* __BUTTON_H__*/
+#endif /* BUTTON_H_*/

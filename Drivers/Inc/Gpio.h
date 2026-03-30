@@ -6,67 +6,76 @@
  *  
  */
 
- #ifndef __GPIO_H__
- #define __GPIO_H__
+ #ifndef GPIO_H_
+ #define GPIO_H_
 
  #include <stdint.h>
- #include <stdbool.h>
  #include "Stm32l4xx.h"
 
+ typedef enum {
+    GPIO_PIN_0 = 0x0000,
+    GPIO_PIN_1,
+    GPIO_PIN_2,
+    GPIO_PIN_3,
+    GPIO_PIN_4,
+    GPIO_PIN_5,
+    GPIO_PIN_6,
+    GPIO_PIN_7,
+    GPIO_PIN_8,
+    GPIO_PIN_9,
+    GPIO_PIN_10,
+    GPIO_PIN_11,
+    GPIO_PIN_12,
+    GPIO_PIN_13,
+    GPIO_PIN_14,
+    GPIO_PIN_15
+} GPIO_Pin_t;
+
 
 typedef enum {
-    GPIO_BANK_A = 0,
-    GPIO_BANK_B,
-    GPIO_BANK_C,
-    GPIO_BANK_D,
-    GPIO_BANK_E,
-    GPIO_BANK_F,
-    GPIO_BANK_G,
-    GPIO_BANK_H,
-    GPIO_BANK_COUNT
-} GPIO_Bank_t;
-
-typedef enum {
-    GPIO_MODE_INPUT = 0,
-    GPIO_MODE_OUTPUT,
-    GPIO_MODE_ALTERNATE,
-    GPIO_MODE_ANALOG,
-    GPIO_MODE_UNKNOWN
+    GPIO_MODE_INPUT = 0x00U,
+    GPIO_MODE_OUTPUT = 0x01U,
+    GPIO_MODE_ALT = 0x02U,
+    GPIO_MODE_ANALOG = 0x03U
 } GPIO_Mode_t;
 
 typedef enum {
-    GPIO_OUTPUT_PUSH_PULL,
-    GPIO_OUTPUT_OPEN_DRAIN
+    GPIO_OTYPE_PUSH_PULL = 0x00U,
+    GPIO_OTYPE_OPEN_DRAIN = 0x01U
 } GPIO_Output_Type_t;
 
 typedef enum {
-    GPIO_PULL_NONE = 0,
-    GPIO_PULL_UP,
-    GPIO_PULL_DOWN,
-    GPIO_RESERVED
+    GPIO_PULL_NONE = 0x00U,
+    GPIO_PULL_UP = 0x01U,
+    GPIO_PULL_DOWN = 0x02U,
 } GPIO_Pull_t;
 
+/**
+ * @brief GPio Pin State
+ */
 typedef enum {
-    GPIO_PIN_LOW =0,
-    GPIO_PIN_HIGH
+    GPIO_PIN_LOW = 0x00U,
+    GPIO_PIN_HIGH = 0x01U
 } GPIO_Pin_State_t;
 
 typedef enum {
-    GPIO_LOW_SPEED = 0,
-    GPIO_MEDIUM_SPEED,
-    GPIO_HIGH_SPEED,
-    GPIO_VERY_HIGH_SPEED
+    GPIO_LOW_SPEED = 0x00U,
+    GPIO_MEDIUM_SPEED = 0x01U,
+    GPIO_HIGH_SPEED = 0x02U,
+    GPIO_VERY_HIGH_SPEED = 0x03U
 } GPIO_Pin_Output_Speed_t;
 
 typedef struct 
 {
     GPIO_RegDef_t *Port;
     uint8_t pin;
-    GPIO_Mode_t mode;
-    GPIO_Output_Type_t otype;
-    GPIO_Pull_t pull;
-    GPIO_Pin_Output_Speed_t speed;
-    uint8_t alternate_func;
+
+    GPIO_Mode_t Mode;
+    GPIO_Output_Type_t Otype;
+    GPIO_Pull_t Pull;
+    GPIO_Pin_Output_Speed_t Speed;
+
+    uint8_t Alternate;
 } GPIO_Pin_Config_t;
 
 /* Helper macros */
@@ -74,31 +83,32 @@ typedef struct
 
 
 /* Function Prototypes*/
-void GPIO_Clock_Enable(GPIO_RegDef_t *Port);
-void GPIO_Clock_Disable(GPIO_RegDef_t *Port);
+void GPIO_Clock_Enable(GPIO_RegDef_t *Gpiox); //
+void GPIO_Clock_Disable(GPIO_RegDef_t *Gpiox); //
 
-void GPIO_Init(GPIO_Pin_Config_t *Gpiox);
+int GPIO_Init(const GPIO_Pin_Config_t *Gpiox);
+int GPIO_Deinit(const GPIO_Pin_Config_t *Gpiox);
 
-/* Pin Operations */
-void GPIO_WritePin(GPIO_RegDef_t *Port, uint8_t pin, GPIO_Pin_State_t state);
-void GPIO_SetPin(GPIO_RegDef_t *Port, uint8_t pin); // Wrapper
-void GPIO_ResetPin(GPIO_RegDef_t *Port, uint8_t pin); // Wrapper
-GPIO_Pin_State_t GPIO_ReadPin(GPIO_RegDef_t *Port, uint8_t pin);
-void GPIO_TogglePin(GPIO_RegDef_t *Port, uint8_t pin);
+void GPIO_SetPin(GPIO_RegDef_t *Gpiox, uint8_t pin);
+void GPIO_ResetPin(GPIO_RegDef_t *Gpiox, uint8_t pin);
+
+void GPIO_WritePin(GPIO_RegDef_t *Gpiox, uint8_t pin, GPIO_Pin_State_t State); //
+GPIO_Pin_State_t GPIO_ReadPin(GPIO_RegDef_t *Gpiox, uint8_t pin); //
+void GPIO_TogglePin(GPIO_RegDef_t *Gpiox, uint8_t pin); //
 
 /* Config */
-void GPIO_SetPinMode(GPIO_RegDef_t *Port, uint8_t pin, GPIO_Mode_t mode);
-GPIO_Mode_t GPIO_GetPinMode(GPIO_RegDef_t *Port, uint8_t pin);
-void GPIO_SetPinPull(GPIO_RegDef_t *Port, uint8_t pin, GPIO_Pull_t pull);
-void GPIO_SetPinAlternateFunction(GPIO_RegDef_t *Port, uint8_t pin, uint8_t af);
-void GPIO_SetPinOutputSpeed(GPIO_RegDef_t *Port, uint8_t pin, GPIO_Pin_Output_Speed_t speed);
-void GPIO_SetPinOutputType(GPIO_RegDef_t *Port, uint8_t pin, GPIO_Output_Type_t otype);
+int GPIO_SetPinMode(GPIO_RegDef_t *Gpiox, uint8_t pin, GPIO_Mode_t Mode);
+int GPIO_SetPinPull(GPIO_RegDef_t *Gpiox, uint8_t pin, GPIO_Pull_t Pull);
+int GPIO_SetPinAF(GPIO_RegDef_t *Gpiox, uint8_t pin, uint8_t af);
+int GPIO_SetPinOutputSpeed(GPIO_RegDef_t *Gpiox, uint8_t pin, GPIO_Pin_Output_Speed_t Speed);
+int GPIO_SetPinOutputType(GPIO_RegDef_t *Gpiox, uint8_t pin, GPIO_Output_Type_t Otype);
 
 /* Port Operations */
-void GPIO_WritePort(GPIO_RegDef_t *Port, uint16_t value);
-void GPIO_SetPort(GPIO_RegDef_t *Port, uint16_t mask);
-uint16_t GPIO_ReadPort(GPIO_RegDef_t *Port);
-void GPIO_ResetPort(GPIO_RegDef_t *Port, uint16_t mask);
+void GPIO_WritePort(GPIO_RegDef_t *Gpiox, uint16_t value);
+void GPIO_SetPort(GPIO_RegDef_t *Gpiox, uint16_t mask);
+uint16_t GPIO_ReadPort(GPIO_RegDef_t *Gpiox);
+void GPIO_ResetPort(GPIO_RegDef_t *Gpiox, uint16_t mask);
 
 
-#endif /* GPIO_H */
+
+#endif /* GPIO_H_*/

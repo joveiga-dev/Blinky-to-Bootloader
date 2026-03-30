@@ -5,16 +5,21 @@
 
 #include <stdint.h>
 
-#define RAM_START       0X20000000U
-#define RAM_SIZE        (96 * 1024) // 96Kbytes
-#define RAM_END         ((RAM_START) + (RAM_SIZE))   // 0x20018000
+#define SRAM_BASE        0X20000000U             // Data memory
+#define SRAM_SIZE        (96 * 1024) // 96Kbytes
+#define SRAM_END         ((SRAM_BASE) + (SRAM_SIZE))   // 0x20018000
 
-#define STACK_TOP       (RAM_END)
+#define STACK_TOP       (SRAM_END)
 
 /* Linker Symbols*/
 extern uint32_t _sbss, _ebss;
 extern uint32_t _sdata, _edata;
 extern uint32_t _etext;
+
+/**
+ * 
+ */
+void check_stack_usage(void);
 
 /**
  * Main function
@@ -92,5 +97,19 @@ void Default_Handler(void)
     while (1) (void) 0;
 }
 
+/*
+void check_stack_usage(void)
+{
+    uint8_t *stack_ptr;
+    asm volatile ("mov %0, sp" : "=r" (stack_ptr));
+
+    // Calculate Stack Usage
+    uint32_t stack_used = STACK_TOP - (uint32_t)stack_ptr;
+    if (stack_used > STACK_SIZE -1024)
+    {
+        // Stack nearly full - take action
+    }
+}
+*/
 
 

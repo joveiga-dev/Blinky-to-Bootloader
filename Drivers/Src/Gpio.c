@@ -1,20 +1,21 @@
 #include "Gpio.h"
 #include "Stm32l4xx.h"
 
+#include <stdio.h>
+
 /**
  *  GPIO_Clock_Enable
  * @brief Enable Clock for a given GPIO Port
  * @return None
  */
-void GPIO_Clock_Enable(GPIO_RegDef_t *Port)
+void GPIO_Clock_Enable(GPIO_RegDef_t *Gpiox)
 {
-    uint32_t index_port = GET_GPIO_INDEX(Port);
-    if (index_port < 8)
+    uint32_t index_port = GET_GPIO_INDEX(Gpiox);
+    if (index_port < 8U)
     {
         RCC->RCC_AHB2ENR |= GPIO_PIN_MASK(index_port);
         (void)RCC->RCC_AHB2ENR;
     }
-
 }
 
 /**
@@ -22,10 +23,11 @@ void GPIO_Clock_Enable(GPIO_RegDef_t *Port)
  * @brief Disable Clock for a given GPIO Port
  * @return None
  */
-void GPIO_Clock_Disable(GPIO_RegDef_t *Port)
+void GPIO_Clock_Disable(GPIO_RegDef_t *Gpiox)
 {
-    uint32_t index_port =  GET_GPIO_INDEX(Port);
-    if (index_port < 8)
+    uint32_t index_port =  GET_GPIO_INDEX(Gpiox);
+
+    if (index_port < 8U)
     {
         RCC->RCC_AHB2ENR &= ~GPIO_PIN_MASK(index_port);
         // Wait for the module to become operational 
@@ -33,47 +35,39 @@ void GPIO_Clock_Disable(GPIO_RegDef_t *Port)
     }
 }
 
-/**
- * GPIO_SetPin
- * Set pin for a specific port
- */
-void GPIO_SetPin(GPIO_RegDef_t *Port, uint8_t pin)
+
+void GPIO_SetPin(GPIO_RegDef_t *Gpiox, uint8_t pin)
 {
-    if (GET_GPIO_INDEX(Port) > 8 || pin > 15)
-    {
-        return;
-    }
-
-    //Port->ODR |= GPIO_PIN_MASK(pin);
-    Port->BSRR = GPIO_PIN_MASK(pin);
+    Gpiox->BSRR = (1U << pin);
 }
-
-/**
- * GPIO_ClearPin
- * @brief Clear pin for a specific port
- */
-void GPIO_ResetPin(GPIO_RegDef_t *Port, uint8_t pin)
-{   
-    if (GET_GPIO_INDEX(Port) > 8 || pin > 15)
-    {
-        return;
-    }
-
-    //Port->ODR &= ~GPIO_PIN_MASK(pin);
-    Port->BSRR |= GPIO_PIN_MASK(pin + 16);
+void GPIO_ResetPin(GPIO_RegDef_t *Gpiox, uint8_t pin)
+{
+    Gpiox->BSRR = (1U << (pin + 16U));
 }
 
 /**
  * GPIO_TogglePin
+ * @brief Toggle pin for a specific port
  */
-void GPIO_TogglePin(GPIO_RegDef_t *Port, uint8_t pin)
+void GPIO_TogglePin(GPIO_RegDef_t *Gpiox, uint8_t pin)
 {
-    if (GET_GPIO_INDEX(Port) > 8 || pin > 15)
+
+    if (!Gpiox || pin > 15U)
     {
         return;
     }
 
-    Port->ODR ^= GPIO_PIN_MASK(pin);
+    uint32_t curr_state = Gpiox->ODR;
+
+    // Read current state and toggle
+    if (curr_state & GPIO_PIN_MASK(pin))
+    {
+        GPIO_ResetPin(Gpiox, pin);
+    }
+    else
+    {
+        GPIO_SetPin(Gpiox, pin);
+    }
 }
 
 /**
@@ -82,44 +76,38 @@ void GPIO_TogglePin(GPIO_RegDef_t *Port, uint8_t pin)
  * @param pin: Pin (0-15)
  * @param mode: Mode (Input, output, Alternate Function, Analog)
  */
-void GPIO_SetPinMode(GPIO_RegDef_t *Port, uint8_t pin, GPIO_Mode_t mode)
-{
-    if (GET_GPIO_INDEX(Port) > 8 || pin > 15)
+int GPIO_SetPinMode(GPIO_RegDef_t *Gpiox, uint8_t pin, GPIO_Mode_t Mode)
+{   
+    if (!Gpiox || pin > 15U)
     {
-        return;
-    }
-    Port->MODER &= ~(3U << (pin * 2)); // clear previous mode
-    Port->MODER |= ((uint32_t) mode & 3) << (pin *2 ); // set new mode
-}
-
-/**
- * GPIO_GetPinMode
- * @brief 
- */
-GPIO_Mode_t GPIO_GetPinMode(GPIO_RegDef_t *Port, uint8_t pin)
-{
-    
-    if (GET_GPIO_INDEX(Port) > 8 || pin > 15)
-    {
-        return;
+        return -1;
     }
 
-    return (GPIO_Mode_t)((Port->MODER >> (pin *2)) & 0x3); // (reg >> offset ) & mask
+    uint32_t shift = pin *2U;
+
+    Gpiox->MODER &= ~(3U << shift);
+    Gpiox->MODER |= ((uint32_t)  Mode & 3U) << shift;
+    return 0;
 }
+
 
 /**
  * GPIO_WritePin
  */
-void GPIO_WritePin(GPIO_RegDef_t *Port, uint8_t pin, GPIO_Pin_State_t state)
+void GPIO_WritePin(GPIO_RegDef_t *Gpiox, uint8_t pin, GPIO_Pin_State_t State)
 {
-    
-    if (GPIO_PIN_HIGH == state)
+    if (!Gpiox || pin > 15U)
     {
-        GPIO_SetPin(Port, pin);
+        return;
+    }
+
+    if (GPIO_PIN_HIGH == State)
+    {
+        GPIO_SetPin(Gpiox, pin);
     }
     else
     {
-        GPIO_ClearPin(Port, pin);
+        GPIO_ResetPin(Gpiox, pin);
     }
 }
 
@@ -127,27 +115,33 @@ void GPIO_WritePin(GPIO_RegDef_t *Port, uint8_t pin, GPIO_Pin_State_t state)
  * GPIO_ReadPin
  */
 
-GPIO_Pin_State_t GPIO_ReadPin(GPIO_RegDef_t *Port, uint8_t pin)
+GPIO_Pin_State_t GPIO_ReadPin(GPIO_RegDef_t *Gpiox, uint8_t pin)
 {
-    if (GET_GPIO_INDEX(Port) > 8 || pin > 15)
+    if (!Gpiox || pin > 15U)
     {
-        return;
+        return GPIO_PIN_LOW;
     }
-    return (Port->IDR & GPIO_PIN_MASK(pin)) ? GPIO_PIN_HIGH : GPIO_PIN_LOW;
+
+    return ((Gpiox->IDR & GPIO_PIN_MASK(pin)) != 0U)
+            ? GPIO_PIN_HIGH
+            : GPIO_PIN_LOW;
 }
 
 /**
  * Configure Pull-up down
  */
-void GPIO_SetPinPull(GPIO_RegDef_t *Port, uint8_t pin, GPIO_Pull_t pull)
+int GPIO_SetPinPull(GPIO_RegDef_t *Gpiox, uint8_t pin, GPIO_Pull_t Pull)
 {
-    if (GET_GPIO_INDEX(Port) > 8 || pin > 15)
+    if (!Gpiox || pin > 15U)
     {
-        return;
+        return -1;
     }
 
-    Port->PUPDR &= ~(3U << (pin * 2));
-    Port->PUPDR |= ((uint32_t) pull & 3U) << (pin *2 );
+    uint32_t shift = pin * 2U;
+
+    Gpiox->PUPDR &= ~(3U << shift);
+    Gpiox->PUPDR |= ((uint32_t) Pull & 3U) << shift;
+    return 0;
 }
 
 /**
@@ -155,17 +149,20 @@ void GPIO_SetPinPull(GPIO_RegDef_t *Port, uint8_t pin, GPIO_Pull_t pull)
  * @param pin: Pin (0-15)
  * @param af: Value of function (0 a 15)
  */
-void GPIO_SetPinAlternateFunction(GPIO_RegDef_t *Port, uint8_t pin, uint8_t af)
+int GPIO_SetPinAF(GPIO_RegDef_t *Gpiox, uint8_t pin, uint8_t af)
 {
     
-    if (GET_GPIO_INDEX(Port) > 8 || pin > 15 || af > 15)
+    if (!Gpiox || pin > 15U || af > 15U)
     {
-        return;
+        return -1;
     }
 
-    uint8_t afr_idndex = pin >> 3;
-    Port->AFR[afr_idndex] &= ~(0xFU << ((pin & 7) * 4));
-    Port->AFR[afr_idndex] |= ((uint32_t)(af & 0xFU) << ((pin & 7) * 4));
+    uint8_t afr_index = pin >> 3U;
+    uint32_t shift = (pin & 7U) * 4U;
+
+    Gpiox->AFR[afr_index] &= ~(0xFU << shift);
+    Gpiox->AFR[afr_index] |= ((uint32_t) af << shift);
+    return 0;
 }
 
 /**
@@ -174,16 +171,17 @@ void GPIO_SetPinAlternateFunction(GPIO_RegDef_t *Port, uint8_t pin, uint8_t af)
  * @param pin: Pin (0-15)
  * @param speed: enum (Low, Medium, High, Very High)
  */
-void GPIO_SetPinOutputSpeed(GPIO_RegDef_t *Port, uint8_t pin, GPIO_Pin_Output_Speed_t speed)
+int GPIO_SetPinOutputSpeed(GPIO_RegDef_t *Gpiox, uint8_t pin, GPIO_Pin_Output_Speed_t Speed)
 {
-    if (GET_GPIO_INDEX(Port) > 8 || pin > 15)
+    if (!Gpiox || pin > 15U)
     {
-        return;
+        return -1;
     }
 
-    Port->OSPEEDR &= ~(3U << (pin *2));
-    Port->OSPEEDR |= ((uint32_t) speed & 3U) << (pin *2 );
-
+    uint32_t shift = pin *2U;
+    Gpiox->OSPEEDR &= ~(3U << shift);
+    Gpiox->OSPEEDR |= ((uint32_t) Speed & 3U) << shift;
+    return 0;
 }
 
 /**
@@ -192,56 +190,82 @@ void GPIO_SetPinOutputSpeed(GPIO_RegDef_t *Port, uint8_t pin, GPIO_Pin_Output_Sp
  * @param pin: Pin (0-15)
  * @param otype: enum (Push-pull, Open-drain)
  */
-void GPIO_SetPinOutputType(GPIO_RegDef_t *Port, uint8_t pin, GPIO_Output_Type_t otype)
+int GPIO_SetPinOutputType(GPIO_RegDef_t *Gpiox, uint8_t pin, GPIO_Output_Type_t Otype)
 {
-    if (GET_GPIO_INDEX(Port) > 8 || pin > 15)
+    if (!Gpiox || pin > 15U)
     {
-        return;
+        return -1;
     }
 
-    if (otype == GPIO_OUTPUT_OPEN_DRAIN)
+    if (Otype == GPIO_OTYPE_OPEN_DRAIN)
     {
-        Port->OTYPER |= (1U << pin);
+        Gpiox->OTYPER |= (1U << pin);
     }
     else
     {
-        Port->OTYPER &= ~(1U << pin);
+        Gpiox->OTYPER &= ~(1U << pin);
     }
+    return 0;
 
 }
 
 /**
  * 
  */
-void GPIO_Init(GPIO_Pin_Config_t *Gpiox)
+int GPIO_Init(const GPIO_Pin_Config_t *Gpiox)
 {
+    if (!Gpiox || !Gpiox->Port || Gpiox->pin > 15U)
+    {
+        return -1;
+    }
+    
     GPIO_Clock_Enable(Gpiox->Port);
+
+    GPIO_SetPinMode(Gpiox->Port, Gpiox->pin, Gpiox->Mode);
+    GPIO_SetPinPull(Gpiox->Port, Gpiox->pin, Gpiox->Pull);
+
+    if (Gpiox->Mode == GPIO_MODE_OUTPUT)
+    {
+        GPIO_SetPinOutputType(Gpiox->Port, Gpiox->pin, Gpiox->Otype);
+        GPIO_SetPinOutputSpeed(Gpiox->Port, Gpiox->pin, Gpiox->Speed);
+    }
+
+    if (Gpiox->Mode == GPIO_MODE_ALT)
+    {
+        GPIO_SetPinAF(Gpiox->Port, Gpiox->pin, Gpiox->Alternate);
+    }
+
+    return 0;
     
 }
 
 /**
  * Write to entire GPIO port (all 16 pins)
  */
-void GPIO_WritePort(GPIO_RegDef_t *Port, uint16_t value)
+void GPIO_WritePort(GPIO_RegDef_t *Gpiox, uint16_t value)
 {
-    Port->ODR = (uint32_t)value;
+    if(!Gpiox) return;
+    Gpiox->ODR = (uint32_t)value;
 }
 
-void GPIO_SetPort(GPIO_RegDef_t *Port, uint16_t mask)
-{
-    Port->BSRR = (uint32_t) mask;
+void GPIO_SetPort(GPIO_RegDef_t *Gpiox, uint16_t mask)
+{   
+    if(!Gpiox) return;
+    Gpiox->BSRR = (uint32_t) mask;
 }
 /**
  * Read entire GPIO port (all 16 pins)
  */
-uint16_t GPIO_ReadPort(GPIO_RegDef_t *Port)
+uint16_t GPIO_ReadPort(GPIO_RegDef_t *Gpiox)
 {
-    return (uint16_t)Port->IDR;
+    if(!Gpiox) return 0;
+    return (uint16_t)Gpiox->IDR;
 }
 
-void GPIO_ResetPort(GPIO_RegDef_t *Port, uint16_t mask)
+void GPIO_ResetPort(GPIO_RegDef_t *Gpiox, uint16_t mask)
 {
-    Port->BSRR = (uint16_t) mask << 16;
+    if(!Gpiox) return;
+    Gpiox->BSRR = (uint16_t) mask << 16U;
 }
 
 

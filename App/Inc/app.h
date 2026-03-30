@@ -1,9 +1,9 @@
 
- #ifndef __APP_H__
- #define __APP_H__
+ #ifndef APP_H_
+ #define APP_H_
 
- void app_init(void);
- void app_task(void);
+ void App_Init(void);
+ void App_Task(void);
 
 
  #endif

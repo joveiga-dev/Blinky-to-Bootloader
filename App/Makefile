@@ -124,5 +124,7 @@ dfu:
 clean:
 	@echo "Cleaning build directory..."
 	@rm -rf $(BUILD_DIR)/*.o $(BUILD_DIR)/*.elf $(BUILD_DIR)/*.bin $(BUILD_DIR)/*.map
+	@echo "Deleting all"
+	@rm -rf $(BUILD_DIR)
 
 .PHONY: all clean size flash dfu 

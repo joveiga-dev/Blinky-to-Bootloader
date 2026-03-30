@@ -1,106 +1,107 @@
-#include "driver_gpio.h"
-#include "led.h"
-
-#include <stdlib.h>
-
-
-typedef struct
-{
-    gpio_bank_t bank;
-    uint16_t pin;
-} led_hw_t;
+#include "Gpio.h"
+#include "Led.h"
 
 
 // HW MAPPING TABLE FOR LED
-static const led_hw_t led_hw[LED_MAX_COUNT] = {
-    [LED_NUM_1] = {
-        .bank = USER_LED2_BANK,
-        .pin = USER_LED2_PIN
+static const Led_t Led[LEDN] = {
+    [LED1] = {  // User Led -> PA5
+        .Gpiox = USER_LED2_BANK,
+        .pin = USER_LED2_PIN,
+        .active_state = LED_ACTIVE_HIGH
     },
 
-    [LED_NUM_2] = {
-        .bank = EXT_LED_BANK,
-        .pin = EXT_LED_PIN
+    [LED2] = {  // External Led -> PB5
+        .Gpiox = EXT_LED_BANK,
+        .pin = EXT_LED_PIN,
+        .active_state = LED_ACTIVE_HIGH
     }
+
 };
 
-static inline const led_hw_t *get_led(led_id_t led) {
-    if (led >= LED_MAX_COUNT) {
-        return NULL;
-    }
-    else {
-        return &led_hw[led];
-    }
-}
-
 /**
- * Initialize user LED on STM32
+ * 
  */
-void user_led_init(void)
-{   
-    for (uint32_t i = 0; i < LED_MAX_COUNT; i++)
+void Led_Init(Led_Id_t Ledx)
+{
+
+    if (Ledx >= LEDN)
     {
-        gpio_enable_bank(led_hw[i].bank);
-        gpio_mode_set(led_hw[i].bank, led_hw[i].pin, GPIO_MODE_OUTPUT);
-        gpio_pin_clear(led_hw[i].bank, led_hw[i].pin);
-
-    }
-    
- 
-}
-
-/**
- * Turn LED on
- */
-void user_led_on(led_id_t led)
-{   
-
-   const led_hw_t *hw = get_led(led);
-   if(!hw) {
-        return;
-   }
-
-   gpio_pin_set(hw->bank, hw->pin);
-    
-}
-
-/**
- * Turn LED off
- */
-void user_led_off(led_id_t led)
-{
-   const led_hw_t *hw = get_led(led);
-   if(!hw) {
-        return;
-   }
-
-   gpio_pin_clear(hw->bank, hw->pin);
-     
-}
-/**
- * Toggle LED
- */
-void user_led_toggle(led_id_t led)
-{
-   const led_hw_t *hw = get_led(led);
-   if(!hw) {
-        return;
-   }
-
-   gpio_pin_toggle(hw->bank, hw->pin);
-    
-}
-
-/**
- * Set LED to specific state
- */
-void user_led_write(led_id_t led, gpio_pin_state_t state)
-{
-    
-    const led_hw_t *hw = get_led(led);
-    if(!hw) {
         return;
     }
-    
-    gpio_pin_write(hw->bank, hw->pin, state);
+
+    GPIO_Pin_Config_t config = {
+        .Port = Led[Ledx].Gpiox,
+        .pin = Led[Ledx].pin,
+        .Mode = GPIO_MODE_OUTPUT,
+        .Otype = GPIO_OTYPE_PUSH_PULL,
+        .Pull = GPIO_PULL_NONE,
+        .Speed = GPIO_LOW_SPEED,
+    };
+
+    GPIO_Init(&config);
+    Led_Off(Ledx);
+
 }
+
+void Led_InitAllLeds(void)
+{
+    for (Led_Id_t i = 0; i < LEDN; i++)
+    {
+        Led_Init(i);
+    }
+    
+}
+
+void Led_DeInitAllLeds(void)
+{
+    for (Led_Id_t i = 0; i < LEDN; i++)
+    {
+        Led_Off(i);
+    }
+}
+
+// Helper
+static void Led_Write(const Led_t *Ledx, Led_State_t State)
+{
+    if (Ledx->active_state == LED_ACTIVE_HIGH)
+    {
+        GPIO_WritePin(Ledx->Gpiox, Ledx->pin, State ? GPIO_PIN_HIGH : GPIO_PIN_LOW);
+    }
+    else
+    {
+        GPIO_WritePin(Ledx->Gpiox, Ledx->pin,  State ? GPIO_PIN_LOW : GPIO_PIN_HIGH);
+    }
+}
+
+
+void Led_On(Led_Id_t Ledx)
+{
+    if (Ledx >= LEDN) return;
+
+    //LED_Config_t *cfg = &LED_Config[Ledx];
+    
+    Led_Write(&Led[Ledx], LED_STATE_ON);
+
+}
+
+void Led_Off(Led_Id_t Ledx)
+{
+    if (Ledx >= LEDN) return;
+
+    //LED_Config_t *cfg = &LED_Config[Ledx];
+    
+    Led_Write(&Led[Ledx], LED_STATE_OFF);
+}
+
+void Led_Toggle(Led_Id_t Ledx)
+{
+    if (Ledx >= LEDN)
+        return;
+
+    GPIO_TogglePin(Led[Ledx].Gpiox, Led[Ledx].pin);
+}
+
+
+
+
+

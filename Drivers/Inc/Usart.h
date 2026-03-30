@@ -75,6 +75,7 @@ void USART_Init(USART_Config_t *config);
 void USART_Clock_Enable(USART_Config_t *config);
 void USART_Clock_Disable(USART_Config_t *config);
 uint32_t USART_Calc_BRR(uint32_t pclk, uint32_t baud, uint8_t);
+void USART_WriteString(const char *buffer);
 
 void uart_config(USART_RegDef_t *uart, uint32_t baud_rate);
 void uart_write_string(const char *buffer);

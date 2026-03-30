@@ -1,14 +1,12 @@
-#ifndef __STM32L476XX_H_
-#define __STM32L476XX_H_
+#ifndef STM32L476XX_H_
+#define STM32L476XX_H_
 
 #include <stdint.h>
 
-/* Memory map for STM32L4 board
-* Section 2.2.2 of the reference manual
-*/
 /* Base Addresses*/
-#define FLASH_BASE                    (0x08000000U)
-#define PERIPH_BASE                   (0x40000000U) // Same as APB1
+#define FLASH_BASE                    (0x08000000U)      // Code memory
+#define SRAM_BAsE                     (0x20000000U)      // Data memory
+#define PERIPH_BASE                   (0x40000000U)      // Peripheral registers
 
 /* Bus base addresses */
 #define APB1_BASE              (PERIPH_BASE + 0x00000U)

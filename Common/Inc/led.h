@@ -1,42 +1,50 @@
-#ifndef __LED_H__
-#define __LED_H__
+#ifndef LED_H_
+#define LED_H_
 
-#include <stdint.h>
-#include <stdbool.h>
 #include "Gpio.h"
 
 /* STM32 User LED Definition */
-#define USER_LED2_BANK        GPIO_BANK_A
-#define USER_LED2_PIN         5
+#define USER_LED2_BANK        GPIOA
+#define USER_LED2_PIN         GPIO_PIN_5
 
 /* External LEDS */
-#define EXT_LED_BANK        GPIO_BANK_B
-#define EXT_LED_PIN         5
+#define EXT_LED_BANK          GPIOB
+#define EXT_LED_PIN           GPIO_PIN_5
 
 typedef enum {
-    LED_NUM_1 = 0,
-    LED_NUM_2,
-    LED_MAX_COUNT
-} led_id_t;
+    LED1 = 0,
+    LED2,
+    LEDN
+} Led_Id_t;
 
 typedef enum {
-    LED_OFF = 0,
-    LED_ON
-} led_state_t;
+    LED_ACTIVE_HIGH = 0,
+    LED_ACTIVE_LOW
+} Led_Active_t;
 
-typedef struct
-{
-    void (*set)(uint8_t val);
-    void (*toggle)(void);
-} led_t;
+typedef enum {
+    LED_STATE_OFF = 0,
+    LED_STATE_ON,
+    LED_STATE_3BLINKS_OFF,
+    LED_STATE_FAST_BLINK,
+    LED_STATE_SLOW_BLINK
+} Led_State_t;
+
+// LED Control Application
+typedef struct {
+    GPIO_RegDef_t * Gpiox;
+    uint8_t pin;
+    Led_Active_t active_state;
+}Led_t;
 
 
 /* User LED api */
-void user_led_init(void);
+void Led_Init(Led_Id_t Ledx);
+void Led_InitAllLeds(void);
+void Led_DeInitAllLeds(void);
+void Led_Toggle(Led_Id_t Ledx);
+void Led_On(Led_Id_t Ledx);
+void Led_Off(Led_Id_t Ledx);
 
-void user_led_on(led_id_t led);
-void user_led_off(led_id_t led);
-void user_led_toggle(led_id_t led);
-void user_led_write(led_id_t led, gpio_pin_state_t state);
 
-#endif /* __LED_H__*/
+#endif /* LED_H_*/
