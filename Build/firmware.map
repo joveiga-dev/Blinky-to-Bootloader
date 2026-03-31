@@ -442,11 +442,17 @@ Discarded input sections
                 0x00000000       0x22 ../Build/Drivers/Src/Gpio.o
  .text.GPIO_ResetPort
                 0x00000000       0x26 ../Build/Drivers/Src/Gpio.o
- .text          0x00000000        0x0 ../Build/Drivers/Src/SystickTimer.o
- .data          0x00000000        0x0 ../Build/Drivers/Src/SystickTimer.o
- .bss           0x00000000        0x0 ../Build/Drivers/Src/SystickTimer.o
- .text.delay_ms
-                0x00000000       0x30 ../Build/Drivers/Src/SystickTimer.o
+ .text          0x00000000        0x0 ../Build/Drivers/Src/SysTick.o
+ .data          0x00000000        0x0 ../Build/Drivers/Src/SysTick.o
+ .bss           0x00000000        0x0 ../Build/Drivers/Src/SysTick.o
+ .text.SysTick_Start
+                0x00000000       0x1c ../Build/Drivers/Src/SysTick.o
+ .text.SysTick_Stop
+                0x00000000       0x1c ../Build/Drivers/Src/SysTick.o
+ .text.SysTick_GetTimeSec
+                0x00000000       0x1c ../Build/Drivers/Src/SysTick.o
+ .text.Delay_Ms
+                0x00000000       0x30 ../Build/Drivers/Src/SysTick.o
  .text          0x00000000        0x0 ../Build/Drivers/Src/Usart.o
  .data          0x00000000        0x0 ../Build/Drivers/Src/Usart.o
  .bss           0x00000000        0x0 ../Build/Drivers/Src/Usart.o
@@ -517,7 +523,7 @@ LOAD ../Build/App/Src/Main.o
 LOAD ../Build/App/Src/Startup.o
 LOAD ../Build/App/Src/Syscalls.o
 LOAD ../Build/Drivers/Src/Gpio.o
-LOAD ../Build/Drivers/Src/SystickTimer.o
+LOAD ../Build/Drivers/Src/SysTick.o
 LOAD ../Build/Drivers/Src/Usart.o
 LOAD ../Build/Common/Src/Button.o
 LOAD ../Build/Common/Src/Led.o
@@ -546,142 +552,153 @@ LOAD /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m/nofp/crtn.o
                 0x08000000                vectors
                 0x08000040                        . = ALIGN (0x4)
 
-.text           0x08000040      0x764
+.text           0x08000040      0x7d0
                 0x08000040                        . = ALIGN (0x4)
  *(.text*)
  .text.App_Init
                 0x08000040       0x1a ../Build/App/Src/App.o
                 0x08000040                App_Init
  *fill*         0x0800005a        0x2 
+ .text.Led_Task
+                0x0800005c       0x38 ../Build/App/Src/App.o
+ .text.Button_Task
+                0x08000094       0x44 ../Build/App/Src/App.o
  .text.App_Task
-                0x0800005c       0x68 ../Build/App/Src/App.o
-                0x0800005c                App_Task
- .text.main     0x080000c4        0xe ../Build/App/Src/Main.o
-                0x080000c4                main
- *fill*         0x080000d2        0x2 
+                0x080000d8       0x10 ../Build/App/Src/App.o
+                0x080000d8                App_Task
+ .text.main     0x080000e8        0xe ../Build/App/Src/Main.o
+                0x080000e8                main
+ *fill*         0x080000f6        0x2 
  .text.Reset_Handler
-                0x080000d4       0x60 ../Build/App/Src/Startup.o
-                0x080000d4                Reset_Handler
+                0x080000f8       0x60 ../Build/App/Src/Startup.o
+                0x080000f8                Reset_Handler
  .text.Default_Handler
-                0x08000134        0x8 ../Build/App/Src/Startup.o
-                0x08000134                SVCall_Handler
-                0x08000134                HardFault_Handler
-                0x08000134                PendSV_Handler
-                0x08000134                NMI_Handler
-                0x08000134                UsageFault_Handler
-                0x08000134                Default_Handler
-                0x08000134                MemManage_Handler
-                0x08000134                BusFault_Handler
-                0x08000134                DebugMonitor_Handler
+                0x08000158        0x8 ../Build/App/Src/Startup.o
+                0x08000158                SVCall_Handler
+                0x08000158                HardFault_Handler
+                0x08000158                PendSV_Handler
+                0x08000158                NMI_Handler
+                0x08000158                UsageFault_Handler
+                0x08000158                Default_Handler
+                0x08000158                MemManage_Handler
+                0x08000158                BusFault_Handler
+                0x08000158                DebugMonitor_Handler
  .text.GPIO_Clock_Enable
-                0x0800013c       0x3c ../Build/Drivers/Src/Gpio.o
-                0x0800013c                GPIO_Clock_Enable
+                0x08000160       0x3c ../Build/Drivers/Src/Gpio.o
+                0x08000160                GPIO_Clock_Enable
  .text.GPIO_SetPin
-                0x08000178       0x20 ../Build/Drivers/Src/Gpio.o
-                0x08000178                GPIO_SetPin
+                0x0800019c       0x20 ../Build/Drivers/Src/Gpio.o
+                0x0800019c                GPIO_SetPin
  .text.GPIO_ResetPin
-                0x08000198       0x22 ../Build/Drivers/Src/Gpio.o
-                0x08000198                GPIO_ResetPin
+                0x080001bc       0x22 ../Build/Drivers/Src/Gpio.o
+                0x080001bc                GPIO_ResetPin
  .text.GPIO_TogglePin
-                0x080001ba       0x4c ../Build/Drivers/Src/Gpio.o
-                0x080001ba                GPIO_TogglePin
+                0x080001de       0x4c ../Build/Drivers/Src/Gpio.o
+                0x080001de                GPIO_TogglePin
  .text.GPIO_SetPinMode
-                0x08000206       0x5e ../Build/Drivers/Src/Gpio.o
-                0x08000206                GPIO_SetPinMode
+                0x0800022a       0x5e ../Build/Drivers/Src/Gpio.o
+                0x0800022a                GPIO_SetPinMode
  .text.GPIO_WritePin
-                0x08000264       0x42 ../Build/Drivers/Src/Gpio.o
-                0x08000264                GPIO_WritePin
+                0x08000288       0x42 ../Build/Drivers/Src/Gpio.o
+                0x08000288                GPIO_WritePin
  .text.GPIO_ReadPin
-                0x080002a6       0x3e ../Build/Drivers/Src/Gpio.o
-                0x080002a6                GPIO_ReadPin
+                0x080002ca       0x3e ../Build/Drivers/Src/Gpio.o
+                0x080002ca                GPIO_ReadPin
  .text.GPIO_SetPinPull
-                0x080002e4       0x5e ../Build/Drivers/Src/Gpio.o
-                0x080002e4                GPIO_SetPinPull
+                0x08000308       0x5e ../Build/Drivers/Src/Gpio.o
+                0x08000308                GPIO_SetPinPull
  .text.GPIO_SetPinAF
-                0x08000342       0x82 ../Build/Drivers/Src/Gpio.o
-                0x08000342                GPIO_SetPinAF
+                0x08000366       0x82 ../Build/Drivers/Src/Gpio.o
+                0x08000366                GPIO_SetPinAF
  .text.GPIO_SetPinOutputSpeed
-                0x080003c4       0x5e ../Build/Drivers/Src/Gpio.o
-                0x080003c4                GPIO_SetPinOutputSpeed
+                0x080003e8       0x5e ../Build/Drivers/Src/Gpio.o
+                0x080003e8                GPIO_SetPinOutputSpeed
  .text.GPIO_SetPinOutputType
-                0x08000422       0x5c ../Build/Drivers/Src/Gpio.o
-                0x08000422                GPIO_SetPinOutputType
+                0x08000446       0x5c ../Build/Drivers/Src/Gpio.o
+                0x08000446                GPIO_SetPinOutputType
  .text.GPIO_Init
-                0x0800047e       0xa2 ../Build/Drivers/Src/Gpio.o
-                0x0800047e                GPIO_Init
- .text.systick_timer_init
-                0x08000520       0x38 ../Build/Drivers/Src/SystickTimer.o
-                0x08000520                systick_timer_init
+                0x080004a2       0xa2 ../Build/Drivers/Src/Gpio.o
+                0x080004a2                GPIO_Init
+ .text.SysTick_Init
+                0x08000544       0x3c ../Build/Drivers/Src/SysTick.o
+                0x08000544                SysTick_Init
  .text.SysTick_Handler
-                0x08000558       0x1c ../Build/Drivers/Src/SystickTimer.o
-                0x08000558                SysTick_Handler
- .text.systicktimer_get_current_count
-                0x08000574       0x14 ../Build/Drivers/Src/SystickTimer.o
-                0x08000574                systicktimer_get_current_count
+                0x08000580       0x1c ../Build/Drivers/Src/SysTick.o
+                0x08000580                SysTick_Handler
+ .text.SysTick_GetTick
+                0x0800059c       0x1c ../Build/Drivers/Src/SysTick.o
+                0x0800059c                SysTick_GetTick
+ .text.SysTick_GetTimeMs
+                0x080005b8        0xe ../Build/Drivers/Src/SysTick.o
+                0x080005b8                SysTick_GetTimeMs
+ *fill*         0x080005c6        0x2 
+ .text.SysTick_Elapsed
+                0x080005c8       0x2c ../Build/Drivers/Src/SysTick.o
+                0x080005c8                SysTick_Elapsed
  .text.Btn_Init
-                0x08000588       0x48 ../Build/Common/Src/Button.o
-                0x08000588                Btn_Init
+                0x080005f4       0x48 ../Build/Common/Src/Button.o
+                0x080005f4                Btn_Init
  .text.Btn_Read
-                0x080005d0       0x48 ../Build/Common/Src/Button.o
-                0x080005d0                Btn_Read
+                0x0800063c       0x48 ../Build/Common/Src/Button.o
+                0x0800063c                Btn_Read
  .text.Led_Init
-                0x08000618       0x58 ../Build/Common/Src/Led.o
-                0x08000618                Led_Init
+                0x08000684       0x58 ../Build/Common/Src/Led.o
+                0x08000684                Led_Init
  .text.Led_InitAllLeds
-                0x08000670       0x2a ../Build/Common/Src/Led.o
-                0x08000670                Led_InitAllLeds
+                0x080006dc       0x2a ../Build/Common/Src/Led.o
+                0x080006dc                Led_InitAllLeds
  .text.Led_Write
-                0x0800069a       0x52 ../Build/Common/Src/Led.o
- .text.Led_On   0x080006ec       0x30 ../Build/Common/Src/Led.o
-                0x080006ec                Led_On
- .text.Led_Off  0x0800071c       0x30 ../Build/Common/Src/Led.o
-                0x0800071c                Led_Off
+                0x08000706       0x52 ../Build/Common/Src/Led.o
+ .text.Led_On   0x08000758       0x30 ../Build/Common/Src/Led.o
+                0x08000758                Led_On
+ .text.Led_Off  0x08000788       0x30 ../Build/Common/Src/Led.o
+                0x08000788                Led_Off
  .text.Led_Toggle
-                0x0800074c       0x38 ../Build/Common/Src/Led.o
-                0x0800074c                Led_Toggle
+                0x080007b8       0x38 ../Build/Common/Src/Led.o
+                0x080007b8                Led_Toggle
  *(.rodata*)
- .rodata.Btn    0x08000784       0x10 ../Build/Common/Src/Button.o
- .rodata.Led    0x08000794       0x10 ../Build/Common/Src/Led.o
-                0x080007a4                        . = ALIGN (0x4)
-                0x080007a4                        _etext = .
+ .rodata.Btn    0x080007f0       0x10 ../Build/Common/Src/Button.o
+ .rodata.Led    0x08000800       0x10 ../Build/Common/Src/Led.o
+                0x08000810                        . = ALIGN (0x4)
+                0x08000810                        _etext = .
 
-.glue_7         0x080007a4        0x0
- .glue_7        0x080007a4        0x0 linker stubs
+.glue_7         0x08000810        0x0
+ .glue_7        0x08000810        0x0 linker stubs
 
-.glue_7t        0x080007a4        0x0
- .glue_7t       0x080007a4        0x0 linker stubs
+.glue_7t        0x08000810        0x0
+ .glue_7t       0x08000810        0x0 linker stubs
 
-.vfp11_veneer   0x080007a4        0x0
- .vfp11_veneer  0x080007a4        0x0 linker stubs
+.vfp11_veneer   0x08000810        0x0
+ .vfp11_veneer  0x08000810        0x0 linker stubs
 
-.v4_bx          0x080007a4        0x0
- .v4_bx         0x080007a4        0x0 linker stubs
+.v4_bx          0x08000810        0x0
+ .v4_bx         0x08000810        0x0 linker stubs
 
-.init           0x080007a4        0x4
- .init          0x080007a4        0x4 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m/nofp/crti.o
-                0x080007a4                _init
+.init           0x08000810        0x4
+ .init          0x08000810        0x4 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m/nofp/crti.o
+                0x08000810                _init
 
-.fini           0x080007a8        0x4
- .fini          0x080007a8        0x4 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m/nofp/crti.o
-                0x080007a8                _fini
+.fini           0x08000814        0x4
+ .fini          0x08000814        0x4 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m/nofp/crti.o
+                0x08000814                _fini
 
-.iplt           0x080007ac        0x0
- .iplt          0x080007ac        0x0 ../Build/App/Src/App.o
+.iplt           0x08000818        0x0
+ .iplt          0x08000818        0x0 ../Build/App/Src/App.o
 
-.rel.dyn        0x080007ac        0x0
- .rel.iplt      0x080007ac        0x0 ../Build/App/Src/App.o
+.rel.dyn        0x08000818        0x0
+ .rel.iplt      0x08000818        0x0 ../Build/App/Src/App.o
 
-.data           0x20000000        0x0 load address 0x080007ac
+.data           0x20000000        0x0 load address 0x08000818
                 0x20000000                        . = ALIGN (0x4)
                 0x20000000                        _sdata = .
  *(.data*)
                 0x20000000                        . = ALIGN (0x4)
                 0x20000000                        _edata = .
 
-.igot.plt       0x20000000        0x0 load address 0x080007ac
+.igot.plt       0x20000000        0x0 load address 0x08000818
  .igot.plt      0x20000000        0x0 ../Build/App/Src/App.o
 
-.bss            0x20000000        0xc load address 0x080007ac
+.bss            0x20000000        0xc load address 0x08000818
                 0x20000000                        _sbss = .
  *(.bss*)
  .bss.last_time.1
@@ -689,9 +706,9 @@ LOAD /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m/nofp/crtn.o
  .bss.last_btn_state.0
                 0x20000004        0x1 ../Build/App/Src/App.o
  *fill*         0x20000005        0x3 
- .bss.systick_ticks
-                0x20000008        0x4 ../Build/Drivers/Src/SystickTimer.o
-                0x20000008                systick_ticks
+ .bss.systick_ms
+                0x20000008        0x4 ../Build/Drivers/Src/SysTick.o
+                0x20000008                systick_ms
  *(COMMON)
                 0x2000000c                        . = ALIGN (0x4)
                 0x2000000c                        _ebss = .
@@ -713,7 +730,7 @@ LOAD linker stubs
  .ARM.attributes
                 0x000000a8       0x2e ../Build/Drivers/Src/Gpio.o
  .ARM.attributes
-                0x000000d6       0x2e ../Build/Drivers/Src/SystickTimer.o
+                0x000000d6       0x2e ../Build/Drivers/Src/SysTick.o
  .ARM.attributes
                 0x00000104       0x2e ../Build/Common/Src/Button.o
  .ARM.attributes
@@ -725,85 +742,85 @@ LOAD linker stubs
  .comment       0x00000026       0x27 ../Build/App/Src/Main.o
  .comment       0x00000026       0x27 ../Build/App/Src/Startup.o
  .comment       0x00000026       0x27 ../Build/Drivers/Src/Gpio.o
- .comment       0x00000026       0x27 ../Build/Drivers/Src/SystickTimer.o
+ .comment       0x00000026       0x27 ../Build/Drivers/Src/SysTick.o
  .comment       0x00000026       0x27 ../Build/Common/Src/Button.o
  .comment       0x00000026       0x27 ../Build/Common/Src/Led.o
 
-.debug_info     0x00000000     0x171b
- .debug_info    0x00000000      0x1f2 ../Build/App/Src/App.o
- .debug_info    0x000001f2       0x50 ../Build/App/Src/Main.o
- .debug_info    0x00000242      0x16a ../Build/App/Src/Startup.o
- .debug_info    0x000003ac      0x83f ../Build/Drivers/Src/Gpio.o
- .debug_info    0x00000beb      0x157 ../Build/Drivers/Src/SystickTimer.o
- .debug_info    0x00000d42      0x495 ../Build/Common/Src/Button.o
- .debug_info    0x000011d7      0x544 ../Build/Common/Src/Led.o
+.debug_info     0x00000000     0x1803
+ .debug_info    0x00000000      0x23f ../Build/App/Src/App.o
+ .debug_info    0x0000023f       0x50 ../Build/App/Src/Main.o
+ .debug_info    0x0000028f      0x16a ../Build/App/Src/Startup.o
+ .debug_info    0x000003f9      0x83f ../Build/Drivers/Src/Gpio.o
+ .debug_info    0x00000c38      0x1f2 ../Build/Drivers/Src/SysTick.o
+ .debug_info    0x00000e2a      0x495 ../Build/Common/Src/Button.o
+ .debug_info    0x000012bf      0x544 ../Build/Common/Src/Led.o
 
-.debug_abbrev   0x00000000      0x7c9
- .debug_abbrev  0x00000000       0xfa ../Build/App/Src/App.o
- .debug_abbrev  0x000000fa       0x4f ../Build/App/Src/Main.o
- .debug_abbrev  0x00000149       0xf9 ../Build/App/Src/Startup.o
- .debug_abbrev  0x00000242      0x1c3 ../Build/Drivers/Src/Gpio.o
- .debug_abbrev  0x00000405      0x10f ../Build/Drivers/Src/SystickTimer.o
- .debug_abbrev  0x00000514      0x13f ../Build/Common/Src/Button.o
- .debug_abbrev  0x00000653      0x176 ../Build/Common/Src/Led.o
+.debug_abbrev   0x00000000      0x802
+ .debug_abbrev  0x00000000       0xfc ../Build/App/Src/App.o
+ .debug_abbrev  0x000000fc       0x4f ../Build/App/Src/Main.o
+ .debug_abbrev  0x0000014b       0xf9 ../Build/App/Src/Startup.o
+ .debug_abbrev  0x00000244      0x1c3 ../Build/Drivers/Src/Gpio.o
+ .debug_abbrev  0x00000407      0x146 ../Build/Drivers/Src/SysTick.o
+ .debug_abbrev  0x0000054d      0x13f ../Build/Common/Src/Button.o
+ .debug_abbrev  0x0000068c      0x176 ../Build/Common/Src/Led.o
 
-.debug_aranges  0x00000000      0x1c0
+.debug_aranges  0x00000000      0x1f8
  .debug_aranges
-                0x00000000       0x28 ../Build/App/Src/App.o
+                0x00000000       0x38 ../Build/App/Src/App.o
  .debug_aranges
-                0x00000028       0x20 ../Build/App/Src/Main.o
+                0x00000038       0x20 ../Build/App/Src/Main.o
  .debug_aranges
-                0x00000048       0x28 ../Build/App/Src/Startup.o
+                0x00000058       0x28 ../Build/App/Src/Startup.o
  .debug_aranges
-                0x00000070       0xa0 ../Build/Drivers/Src/Gpio.o
+                0x00000080       0xa0 ../Build/Drivers/Src/Gpio.o
  .debug_aranges
-                0x00000110       0x38 ../Build/Drivers/Src/SystickTimer.o
+                0x00000120       0x60 ../Build/Drivers/Src/SysTick.o
  .debug_aranges
-                0x00000148       0x28 ../Build/Common/Src/Button.o
+                0x00000180       0x28 ../Build/Common/Src/Button.o
  .debug_aranges
-                0x00000170       0x50 ../Build/Common/Src/Led.o
+                0x000001a8       0x50 ../Build/Common/Src/Led.o
 
 .debug_rnglists
-                0x00000000      0x12f
+                0x00000000      0x159
  .debug_rnglists
-                0x00000000       0x19 ../Build/App/Src/App.o
+                0x00000000       0x25 ../Build/App/Src/App.o
  .debug_rnglists
-                0x00000019       0x13 ../Build/App/Src/Main.o
+                0x00000025       0x13 ../Build/App/Src/Main.o
  .debug_rnglists
-                0x0000002c       0x19 ../Build/App/Src/Startup.o
+                0x00000038       0x19 ../Build/App/Src/Startup.o
  .debug_rnglists
-                0x00000045       0x75 ../Build/Drivers/Src/Gpio.o
+                0x00000051       0x75 ../Build/Drivers/Src/Gpio.o
  .debug_rnglists
-                0x000000ba       0x25 ../Build/Drivers/Src/SystickTimer.o
+                0x000000c6       0x43 ../Build/Drivers/Src/SysTick.o
  .debug_rnglists
-                0x000000df       0x19 ../Build/Common/Src/Button.o
+                0x00000109       0x19 ../Build/Common/Src/Button.o
  .debug_rnglists
-                0x000000f8       0x37 ../Build/Common/Src/Led.o
+                0x00000122       0x37 ../Build/Common/Src/Led.o
 
-.debug_line     0x00000000      0xa40
- .debug_line    0x00000000      0x108 ../Build/App/Src/App.o
- .debug_line    0x00000108       0x5f ../Build/App/Src/Main.o
- .debug_line    0x00000167       0xcb ../Build/App/Src/Startup.o
- .debug_line    0x00000232      0x418 ../Build/Drivers/Src/Gpio.o
- .debug_line    0x0000064a      0x119 ../Build/Drivers/Src/SystickTimer.o
- .debug_line    0x00000763      0x10b ../Build/Common/Src/Button.o
- .debug_line    0x0000086e      0x1d2 ../Build/Common/Src/Led.o
+.debug_line     0x00000000      0xafa
+ .debug_line    0x00000000      0x132 ../Build/App/Src/App.o
+ .debug_line    0x00000132       0x5f ../Build/App/Src/Main.o
+ .debug_line    0x00000191       0xcb ../Build/App/Src/Startup.o
+ .debug_line    0x0000025c      0x418 ../Build/Drivers/Src/Gpio.o
+ .debug_line    0x00000674      0x1a9 ../Build/Drivers/Src/SysTick.o
+ .debug_line    0x0000081d      0x10b ../Build/Common/Src/Button.o
+ .debug_line    0x00000928      0x1d2 ../Build/Common/Src/Led.o
 
-.debug_str      0x00000000      0xa08
- .debug_str     0x00000000      0xa08 ../Build/App/Src/App.o
-                                0x28b (size before relaxing)
- .debug_str     0x00000a08       0xe9 ../Build/App/Src/Main.o
- .debug_str     0x00000a08      0x1cc ../Build/App/Src/Startup.o
- .debug_str     0x00000a08      0x60a ../Build/Drivers/Src/Gpio.o
- .debug_str     0x00000a08      0x215 ../Build/Drivers/Src/SystickTimer.o
- .debug_str     0x00000a08      0x4c4 ../Build/Common/Src/Button.o
- .debug_str     0x00000a08      0x520 ../Build/Common/Src/Led.o
+.debug_str      0x00000000      0xa54
+ .debug_str     0x00000000      0xa54 ../Build/App/Src/App.o
+                                0x2a5 (size before relaxing)
+ .debug_str     0x00000a54       0xe9 ../Build/App/Src/Main.o
+ .debug_str     0x00000a54      0x1cc ../Build/App/Src/Startup.o
+ .debug_str     0x00000a54      0x60a ../Build/Drivers/Src/Gpio.o
+ .debug_str     0x00000a54      0x24e ../Build/Drivers/Src/SysTick.o
+ .debug_str     0x00000a54      0x4c4 ../Build/Common/Src/Button.o
+ .debug_str     0x00000a54      0x520 ../Build/Common/Src/Led.o
 
-.debug_frame    0x00000000      0x574
- .debug_frame   0x00000000       0x50 ../Build/App/Src/App.o
- .debug_frame   0x00000050       0x2c ../Build/App/Src/Main.o
- .debug_frame   0x0000007c       0x48 ../Build/App/Src/Startup.o
- .debug_frame   0x000000c4      0x2ac ../Build/Drivers/Src/Gpio.o
- .debug_frame   0x00000370       0xa0 ../Build/Drivers/Src/SystickTimer.o
- .debug_frame   0x00000410       0x58 ../Build/Common/Src/Button.o
- .debug_frame   0x00000468      0x10c ../Build/Common/Src/Led.o
+.debug_frame    0x00000000      0x65c
+ .debug_frame   0x00000000       0x90 ../Build/App/Src/App.o
+ .debug_frame   0x00000090       0x2c ../Build/App/Src/Main.o
+ .debug_frame   0x000000bc       0x48 ../Build/App/Src/Startup.o
+ .debug_frame   0x00000104      0x2ac ../Build/Drivers/Src/Gpio.o
+ .debug_frame   0x000003b0      0x148 ../Build/Drivers/Src/SysTick.o
+ .debug_frame   0x000004f8       0x58 ../Build/Common/Src/Button.o
+ .debug_frame   0x00000550      0x10c ../Build/Common/Src/Led.o

@@ -23,32 +23,8 @@
 #define RCC_AHB2ENR_OFFSET           (0x4CU)
 #define SCS_BASE                 (0xE000E000UL)
 #define SYSTICK_BASE             (SCS_BASE + 0x0010UL)
-#define SYSTICK                  ((systick_reg_map_t  *) SYSTICK_BASE)
 
-/* Control / Status Register definitions */
-#define SYSTICK_CSR_ENABLE       (BIT_MASK(0U))       /* Enables the counter: 0-> counter disabled, 1 counter enabled.*/
-#define SYSTICK_CSR_CLKSOURCE    (BIT_MASK(2U))       /* Indicates the clock source: 0 external and 1 processor clock */
-#define SYSTICK_CSR_COUNTFLAG    (BIT_MASK(16U))      /* Returns 1 if timer counted to 0 since last time this was read.*/
-#define SYSTICK_CSR_TICKINT      (BIT_MASK(1U))       /* Enables SysTick exception request*/
-
-/* Reload and Value Register definitions */
-#define SYSTICK_RVR_RELOAD_MASK   (0XFFFFFFUL)
-#define SYSTICK_RVR_RELOAD        (SYSTICK_RVR_RELOAD)   // Value to load into the CVR register when the counter is enabled and when it reaches 0
-
-/* Current Value Register definitions */
-#define SYSTICK_CVR_CURRENT     (SYSTICK_RVR_RELOAD_MASK)   /* Returns the current value of the systick counter CURRENT[23:0] */
-
-/* SysTick Calibration Value Register*/
-#define SYSTICK_CALIB_NOREF    BIT_MASK(31U)   /* indicates if the device provides a reference clock to the processor. 0 yes and 1 not*/
-#define SYSTICK_CALIB_SKEW     BIT_MASK(30U) 
-#define SYSTICK_CALIB_TENMS    (SYSTICK_RVR_RELOAD_MASK)
-
-#define CLOCK_FREQ        (4000000UL)
-// Define a frequência do SysTick para 1kHz (1ms por tick)
-#define TICKS_FOR_1MS (CLOCK_FREQ / 1000UL)
-#define MS_TO_TICKS(ms) ((ms * (CLOCK_FREQ / 1000UL)))
-
-#define BIT(pos)        ((0x1UL) << pos)
+#define BIT(pos)                 ((0x1UL) << pos)
 
 /**
  * @brief Reset Control Clock RCC
@@ -207,5 +183,36 @@ typedef struct {
 #define USART_CR2_STOP         (0x3U << 12)
 #define USART_CR2_STOP_0       (0x1U << 12)
 #define USART_CR2_STOP_1       (0x1U << 13)
+
+/* Systick (system timer) Definitions */
+
+#define SYSTICK_CSR_ENABLE       (BIT(0U))       /* Enables the counter: 0-> counter disabled, 1 counter enabled.*/
+#define SYSTICK_CSR_CLKSOURCE    (BIT(2U))       /* Indicates the clock source: 0 external and 1 processor clock */
+#define SYSTICK_CSR_COUNTFLAG    (BIT(16U))           /* Returns 1 if timer counted to 0 since last time this was read.*/
+#define SYSTICK_CSR_TICKINT      (BIT(1U))       /* Enables SysTick exception request*/
+
+/* Reload and Value Register definitions */
+#define SYSTICK_RVR_RELOAD_Msk    (0XFFFFFFUL)
+#define SYSTICK_RVR_RELOAD        (SYSTICK_RVR_RELOAD_Msk)   // Value to load into the CVR register when the counter is enabled and when it reaches 0
+
+/* Current Value Register definitions */
+#define SYSTICK_CVR_CURRENT     (SYSTICK_RVR_RELOAD_Msk)   /* Returns the current value of the systick counter CURRENT[23:0] */
+
+/* SysTick Calibration Value Register*/
+#define SYSTICK_CALIB_NOREF    BIT(31U)   /* indicates if the device provides a reference clock to the processor. 0 yes and 1 not*/
+#define SYSTICK_CALIB_SKEW     BIT(30U) 
+#define SYSTICK_CALIB_TENMS    (SYSTICK_RVR_RELOAD_Msk)
+
+/**
+ * @brief Structure to access the System Timer (SysTick)
+ */
+typedef struct {
+    volatile uint32_t SYST_CSR;      /* offset: 0x000 (R/W) SysTick Control and Status Register */
+    volatile uint32_t SYST_RVR;      /* offset: 0x004 (R/W) SysTick Reload and Value Register */
+    volatile uint32_t SYST_CVR;      /* offset: 0x008 (R/W) SysTick Current Value Register */
+    volatile uint32_t SYST_CALIB;    /* offset 0x00C (R/ )  SysTick Calibration Value Register*/
+} SysTick_RegDef_t;
+
+#define SYSTICK                  ((SysTick_RegDef_t *) SYSTICK_BASE)
 
 #endif

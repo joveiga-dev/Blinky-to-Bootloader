@@ -1,6 +1,6 @@
 #include <stdint.h>
 #include "Led.h"
-#include "SystickTimer.h"
+#include "SysTick.h"
 #include "Button.h"
 #include "App.h"
 #include <stdio.h>
@@ -10,45 +10,46 @@
 
 //static uint32_t button_press_counter = 0;
 
-//BTN_State_t last_btn_state = BTN_RELEASED;
-
-
 void App_Init(void)
 {
     Led_InitAllLeds();
     Btn_Init(BTN1);
 
-    systick_timer_init(TICKS_FOR_1MS);
+    SysTick_Init(SYSTICK_LOAD_1MS);
     
 }
 
-void App_Task(void)
+static void Led_Task(void)
 {
     static uint32_t last_time = 0;
-    static Btn_State_t last_btn_state = BTN_RELEASED;
+    uint32_t current_time = SysTick_GetTimeMs(); 
 
-    uint32_t current_time = systicktimer_get_current_count();
-    Btn_State_t btn_state = Btn_Read(BTN1);
-
-    if ((current_time - last_time) >= BLINK_INTERVAL_MS)
+    if(SysTick_Elapsed(last_time, BLINK_INTERVAL_MS))
     {
         last_time = current_time;
-
-        if (btn_state != BTN_PRESSED) {
-            Led_Toggle(LED1);
-        }
-        
+        Led_Toggle(LED1);
     }
+}
 
-    if (btn_state == BTN_PRESSED && last_btn_state == BTN_RELEASED){
+static void Button_Task(void)
+{
+    static Btn_State_t last_btn_state = BTN_RELEASED;
+    Btn_State_t btn_state = Btn_Read(BTN1);
+    if (btn_state == BTN_PRESSED && last_btn_state == BTN_RELEASED)
+    {
         Led_On(LED2);
     }
-
     else if (btn_state == BTN_RELEASED)
     {
         Led_Off(LED2);
     }
+    last_btn_state = btn_state;
+}
 
+void App_Task(void)
+{
+    Led_Task();
+    Button_Task();
 }
 
 
