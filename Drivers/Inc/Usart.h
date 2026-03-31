@@ -43,17 +43,6 @@ typedef enum {
     MODE_TX_RX
 } USART_Mode_t;
 
-/* GPIO Configuration for USART*/
-typedef struct 
-{
-    GPIO_RegDef_t *Port;
-    uint8_t tx_pin;
-    uint8_t rx_pin;
-    uint8_t alternate_func;
-    uint8_t flow_control;
-} GPIO_USART_Config_t;
-
-
 typedef struct
 {
     USART_RegDef_t *Port;
@@ -66,21 +55,18 @@ typedef struct
 } USART_Config_t;
 
 /* API prototypes */
-void GPIO_USART_Config(GPIO_USART_Config_t *gpiox);
-void USART_SetWordLength(USART_RegDef_t *usartx, USART_Word_Length_t len);
-void USART_SetParity(USART_RegDef_t *usartx, USART_Parity_t par);
-void USART_SetStopBits(USART_RegDef_t *usartx, USART_Stop_Bits_t stop);
-void USART_SetOversampling(USART_RegDef_t *usartx, USART_Oversampling_t over8);
-void USART_Init(USART_Config_t *config);
-void USART_Clock_Enable(USART_Config_t *config);
-void USART_Clock_Disable(USART_Config_t *config);
-uint32_t USART_Calc_BRR(uint32_t pclk, uint32_t baud, uint8_t);
-void USART_WriteString(const char *buffer);
+int USART_Init(USART_Config_t *Usartx);
+void USART_Clock_Enable(USART_Config_t *Usartx);
+void USART_Clock_Disable(USART_Config_t *UsartX);
 
-void uart_config(USART_RegDef_t *uart, uint32_t baud_rate);
-void uart_write_string(const char *buffer);
-void uart_write_char(char c);
-void uart_send_byte(unsigned char byte);
+int USART_SetWordLength(USART_RegDef_t *Usartx, USART_Word_Length_t len);
+int USART_SetParity(USART_RegDef_t *Usartx, USART_Parity_t par);
+int USART_SetStopBits(USART_RegDef_t *Usartx, USART_Stop_Bits_t stop);
+int USART_SetOversampling(USART_RegDef_t *Usartx, USART_Oversampling_t over8);
 
+uint32_t USART_Calc_BRR(uint32_t pclk, uint32_t baud, uint8_t over);
+
+void USART_SendByte(USART_RegDef_t *Usartx, uint8_t byte);
+uint8_t USART_ReceiveByte(USART_RegDef_t *Usartx);
 
 #endif

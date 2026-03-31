@@ -6,8 +6,33 @@
 #include "Button.h"
 #include "App.h"
 #include "Led_fsm.h"
+#include "USerial.h"
 
 #define UART_INTERVAL_MS    500
+
+void Usart_Init(void)
+{
+    static USART_Handle huart2;
+    
+    huart2.Usartx.Port = USART2;
+    huart2.Usartx.baud_rate = 9600;
+    huart2.Usartx.data_bits = 8;
+    huart2.Usartx.stop_bits = 1;
+    huart2.Usartx.parity = 0;
+    huart2.Usartx.oversampling = 0;
+
+    huart2.Gpiox.TX_Port = GPIOA;
+    huart2.Gpiox.tx_pin = 2;
+
+    huart2.Gpiox.RX_Port = GPIOA;
+    huart2.Gpiox.rx_pin = 3;
+
+    huart2.Gpiox.af = 7;
+
+    Userial_Init(&huart2);
+
+    Userial_WriteString(&huart2, "UART READY\r\n");
+}
 
 void App_Init(void)
 {
@@ -15,7 +40,7 @@ void App_Init(void)
     Btn_Init(BTN1);
     SysTick_Init(SYSTICK_LOAD_1MS);
     LedFsm_Init();
-    
+    Usart_Init();
 }
 
 static void Led_Task(void)

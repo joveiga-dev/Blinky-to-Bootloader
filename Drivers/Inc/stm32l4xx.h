@@ -179,6 +179,10 @@ typedef struct {
 #define USART_ISR_TEACK        BIT(21)
 /* Busy flag */
 #define USART_ISR_BUSY         BIT(16)
+/* Transmit data register empty */
+#define USART_ISR_TXE          BIT(7)
+/* Read data register not empty */
+#define USART_ISR_RXNE         BIT(5)  
 
 #define USART_CR2_STOP         (0x3U << 12)
 #define USART_CR2_STOP_0       (0x1U << 12)
