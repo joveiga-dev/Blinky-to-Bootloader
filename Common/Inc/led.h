@@ -25,9 +25,6 @@ typedef enum {
 typedef enum {
     LED_STATE_OFF = 0,
     LED_STATE_ON,
-    LED_STATE_3BLINKS_OFF,
-    LED_STATE_FAST_BLINK,
-    LED_STATE_SLOW_BLINK
 } Led_State_t;
 
 // LED Control Application

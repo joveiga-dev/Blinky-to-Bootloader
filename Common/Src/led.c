@@ -77,18 +77,13 @@ static void Led_Write(const Led_t *Ledx, Led_State_t State)
 void Led_On(Led_Id_t Ledx)
 {
     if (Ledx >= LEDN) return;
-
-    //LED_Config_t *cfg = &LED_Config[Ledx];
     
     Led_Write(&Led[Ledx], LED_STATE_ON);
-
 }
 
 void Led_Off(Led_Id_t Ledx)
 {
     if (Ledx >= LEDN) return;
-
-    //LED_Config_t *cfg = &LED_Config[Ledx];
     
     Led_Write(&Led[Ledx], LED_STATE_OFF);
 }

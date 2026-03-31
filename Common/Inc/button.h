@@ -22,8 +22,7 @@ typedef enum {
 
 typedef enum {
     BTN_RELEASED = 0,
-    BTN_PRESSED,
-    BTN_UNKNOWN
+    BTN_PRESSED
 } Btn_State_t;
 
 // Button interface application

@@ -1,48 +1,45 @@
 #include <stdint.h>
+#include <stdio.h>
+
 #include "Led.h"
 #include "SysTick.h"
 #include "Button.h"
 #include "App.h"
-#include <stdio.h>
+#include "Led_fsm.h"
 
-#define BLINK_INTERVAL_MS   200
 #define UART_INTERVAL_MS    500
-
-//static uint32_t button_press_counter = 0;
 
 void App_Init(void)
 {
     Led_InitAllLeds();
     Btn_Init(BTN1);
-
     SysTick_Init(SYSTICK_LOAD_1MS);
+    LedFsm_Init();
     
 }
 
 static void Led_Task(void)
 {
-    static uint32_t last_time = 0;
     uint32_t current_time = SysTick_GetTimeMs(); 
-
-    if(SysTick_Elapsed(last_time, BLINK_INTERVAL_MS))
-    {
-        last_time = current_time;
-        Led_Toggle(LED1);
-    }
+    LedFsm_Update(current_time);
 }
 
 static void Button_Task(void)
 {
     static Btn_State_t last_btn_state = BTN_RELEASED;
     Btn_State_t btn_state = Btn_Read(BTN1);
+    static uint32_t btn_press_counter = 0;
+
     if (btn_state == BTN_PRESSED && last_btn_state == BTN_RELEASED)
     {
-        Led_On(LED2);
+        LedFsm_EventHandle(USER_LED_EVENT_BUTTON_PRESSED);
+        btn_press_counter++;
     }
     else if (btn_state == BTN_RELEASED)
     {
-        Led_Off(LED2);
+        LedFsm_EventHandle(USER_LED_EVENT_BUTTON_RELEASED);
     }
+
     last_btn_state = btn_state;
 }
 

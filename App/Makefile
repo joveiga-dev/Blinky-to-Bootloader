@@ -47,6 +47,7 @@ LDFLAGS =  $(CPU) -mthumb $(FLOAT) --specs=nosys.specs  $(LINKER) $(MAP_FILE) -g
 INCLUDES = -I$(ROOT_DIR)/App/Inc
 INCLUDES += -I$(ROOT_DIR)/Drivers/Inc
 INCLUDES += -I$(ROOT_DIR)/Common/Inc
+INCLUDES += -I$(ROOT_DIR)/Modules
 
 #---------------------------------------
 # Source Files discovery recursively
@@ -54,7 +55,8 @@ INCLUDES += -I$(ROOT_DIR)/Common/Inc
 APP_SRC := $(wildcard $(ROOT_DIR)/App/Src/*.c)
 DRIVERS_SRC := $(wildcard $(ROOT_DIR)/Drivers/Src/*.c)
 COMMON_SRC := $(wildcard $(ROOT_DIR)/Common/Src/*.c)
-SOURCES := $(APP_SRC) $(DRIVERS_SRC) $(COMMON_SRC)
+MODULES_SRC := $(wildcard $(ROOT_DIR)/Modules/*.c)
+SOURCES := $(APP_SRC) $(DRIVERS_SRC) $(COMMON_SRC) $(MODULES_SRC)
 
 #---------------------------------------------------------------------------------
 # Object files (mirrored into Build)
