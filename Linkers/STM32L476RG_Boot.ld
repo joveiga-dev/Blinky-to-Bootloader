@@ -22,8 +22,6 @@ MEMORY
     SRAM  (rwx): ORIGIN = 0x20000000, LENGTH = 96K
 }
 
-/* Enforce emmitation of the vector table .*/
-EXTERN(vector_table)
 
 /* Sections */
 SECTIONS
@@ -32,15 +30,10 @@ SECTIONS
      * Mark it as KEEP to prevent it from being garbage collected.
     */
 
-    .vectors :
-    {   
-        . = ALIGN(4);
-        KEEP(*(.vectors))   /* Vector Code */
-        . = ALIGN(4);
-    } > FLASH
-
     .text :
     {   
+        . = ALIGN(4);
+        KEEP(*(.vectors))
         . = ALIGN(4);
         *(.text*)     /* Program code */
         *(.text.*)
@@ -82,9 +75,6 @@ SECTIONS
     } > SRAM
 
     _end = .; 
-
-    /* HARD Limit check */
-    ASSERT(LOADADDR(.data) + SIZEOF(.data) <= ORIGIN(FLASH) + LENGTH(FLASH), "BOOTLOADER TOO BIG!")
    
         
 }

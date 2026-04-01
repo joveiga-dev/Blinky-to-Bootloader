@@ -3,18 +3,11 @@
 
 #define BOOTLOADER_SIZE                (0x8000U) // 32KB
 #define MAIN_APP_START_ADDRESS         (FLASH_BASE + BOOTLOADER_SIZE) // 0x08008000
-const uint8_t data[0x4000] = {0};
+
 void Jump_to_App(void);
 
 int main(void)
 {
-    volatile uint8_t x = 0;
-    for (uint32_t i = 0; i < 0x4000; i++)
-    {
-        x += data[i];
-    }
-    
-    
     Jump_to_App();
 
     return 0;

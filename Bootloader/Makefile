@@ -21,7 +21,7 @@ BIN = $(PROJECT).bin
 HEX = $(PROJECT).hex
 MAP = $(PROJECT).map
 ROOT_DIR = ..
-BUILD_DIR = $(ROOT_DIR)/Build
+BUILD_DIR = Build/
 STM32PROGRAMMER_CLI = "/mnt/c/Program Files (x86)/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin/STM32_Programmer_CLI.exe"
 
 LINKER = -T $(ROOT_DIR)/Linkers/STM32L476RG_Boot.ld
@@ -54,7 +54,9 @@ INCLUDES += -I$(ROOT_DIR)/Common/Inc
 BOOT_SRC := $(wildcard $(ROOT_DIR)/Bootloader/Src/*.c)
 DRIVERS_SRC := $(wildcard $(ROOT_DIR)/Drivers/Src/*.c)
 COMMON_SRC := $(wildcard $(ROOT_DIR)/Common/Src/*.c)
-SOURCES := $(BOOT_SRC) $(DRIVERS_SRC) $(COMMON_SRC)
+STARTUP_SRC := $(wildcard $(ROOT_DIR)/Linkers/*.c)
+
+SOURCES := $(BOOT_SRC) $(STARTUP_SRC) $(DRIVERS_SRC) $(COMMON_SRC)
 
 #---------------------------------------------------------------------------------
 # Object files (mirrored into Build)
@@ -96,6 +98,7 @@ $(BUILD_DIR)/$(TARGET): $(OBJECTS) | $(BUILD_DIR)
 $(BUILD_DIR)/$(BIN): $(BUILD_DIR)/$(TARGET)
 	@echo "Generating BIN"
 	$(OBJCOPY) -O binary $< $@
+	python3 pad_bootloader.py
 
 size: $(BUILD_DIR)/$(TARGET)
 	@echo ""

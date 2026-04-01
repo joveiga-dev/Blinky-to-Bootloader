@@ -17,7 +17,6 @@ MEMORY
 {
     FLASH (rx) : ORIGIN = 0x08000000, LENGTH = 1024K
     SRAM  (rwx): ORIGIN = 0x20000000, LENGTH = 96K
-    /*SRAM2(rwx) : ORIGIN = 0x10000000, LENGTH = 32K*/
 }
 
 /* Sections */
@@ -27,16 +26,15 @@ SECTIONS
      * Mark it as KEEP to prevent it from being garbage collected.
     */
 
-    .vectors :
-    {   
-        . = ALIGN(4);
-        KEEP(*(.vectors))   /* Vector Code */
-        . = ALIGN(4);
-    } > FLASH
-
     .text :
     {   
         . = ALIGN(4);
+        KEEP(*(.bootloader_section))
+        . = ALIGN(4);
+        KEEP(*(.vectors))
+        . = ALIGN(4);
+
+
         *(.text*)     /* Program code */
         *(.rodata*)   /* Ready-only data*/
         . = ALIGN(4);

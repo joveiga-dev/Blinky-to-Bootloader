@@ -8,10 +8,18 @@
 #include "Led_fsm.h"
 #include "USerial.h"
 
-#define UART_INTERVAL_MS    500
+#define BOOTLOADER_SIZE    (0x8000U)
+static USART_Handle huart2;
 
-USART_Handle huart2;
+static void Vector_Setup(void)
+{
+    SCB_VTOR_OFFSET = BOOTLOADER_SIZE;
+}
 
+
+/**
+ * 
+ */
 void Usart2_Init(void)
 {
     huart2.Usartx.Port = USART2;
@@ -34,8 +42,12 @@ void Usart2_Init(void)
     Userial_WriteString(&huart2, "USART READY\r\n");
 }
 
+/**
+ * 
+ */
 void App_Init(void)
 {
+    Vector_Setup();
     Led_InitAllLeds();
     Btn_Init(BTN1);
     SysTick_Init(SYSTICK_LOAD_1MS);

@@ -219,4 +219,32 @@ typedef struct {
 
 #define SYSTICK                  ((SysTick_RegDef_t *) SYSTICK_BASE)
 
+
+#define MMIO8(addr)              (*(volatile uint8_t *)(addr))
+#define MMIO16(addr)             (*(volatile uint16_t *)(addr))
+#define MMIO32(addr)             (*(volatile uint32_t *)(addr))
+#define MMIO64(addr)             (*(volatile uint64_t *)(addr))
+
+/**
+ * System Control Block (SCB)
+ */
+
+#define SCB_BASE                  (0xE000ED00UL)
+#define SCB_VTOR_OFFSET           MMIO32(SCB_BASE + 0x08U)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #endif

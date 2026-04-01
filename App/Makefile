@@ -21,7 +21,7 @@ BIN = $(PROJECT).bin
 HEX = $(PROJECT).hex
 MAP = $(PROJECT).map
 ROOT_DIR = ..
-BUILD_DIR = $(ROOT_DIR)/Build
+BUILD_DIR = Build
 STM32PROGRAMMER_CLI = "/mnt/c/Program Files (x86)/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin/STM32_Programmer_CLI.exe"
 
 LINKER = -T $(ROOT_DIR)/Linkers/STM32L476RG_App.ld
@@ -51,15 +51,21 @@ INCLUDES += -I$(ROOT_DIR)/Common/Inc
 #---------------------------------------
 # Source Files discovery recursively
 #-----------------------------------
-APP_SRC := $(wildcard $(ROOT_DIR)/App/Src/*.c)
-DRIVERS_SRC := $(wildcard $(ROOT_DIR)/Drivers/Src/*.c)
-COMMON_SRC := $(wildcard $(ROOT_DIR)/Common/Src/*.c)
-SOURCES := $(APP_SRC) $(DRIVERS_SRC) $(COMMON_SRC)
+APP_SRC_C    := $(wildcard $(ROOT_DIR)/App/Src/*.c)
+APP_SRC_S    := $(wildcard $(ROOT_DIR)/App/Src/*.S)
+DRIVERS_SRC  := $(wildcard $(ROOT_DIR)/Drivers/Src/*.c)
+COMMON_SRC   := $(wildcard $(ROOT_DIR)/Common/Src/*.c)
+STARTUP_SRC  := $(wildcard $(ROOT_DIR)/Linkers/*.c)
+SOURCES      := $(APP_SRC_C) $(APP_SRC_S) $(STARTUP_SRC) $(DRIVERS_SRC) $(COMMON_SRC)
 
 #---------------------------------------------------------------------------------
 # Object files (mirrored into Build)
 #---------------------------------------------------------------------------------
-OBJECTS := $(patsubst $(ROOT_DIR)/%, $(BUILD_DIR)/%, $(SOURCES:.c=.o))
+#OBJECTS      := $(patsubst $(ROOT_DIR)/%, $(BUILD_DIR)/%, $(SOURCES:.c=.o))
+#OBJECTS      += $(patsubst $(ROOT_DIR)/%, $(BUILD_DIR)/%, $(SOURCES:.S=.o))
+
+OBJECTS := $(patsubst $(ROOT_DIR)/%.c,$(BUILD_DIR)/%.o,$(filter %.c,$(SOURCES)))
+OBJECTS += $(patsubst $(ROOT_DIR)/%.S,$(BUILD_DIR)/%.o,$(filter %.S,$(SOURCES)))
 
 #---------------------------------------------------------------------------------
 # Default target
@@ -79,16 +85,20 @@ $(BUILD_DIR)/%.o: $(ROOT_DIR)/%.c | $(BUILD_DIR)
 	@echo "Compiling $<"
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
+#----------------------------------------------------------------------------
+# Compile rules (S)
+#---------------------------------------------------------------------------
+$(BUILD_DIR)/%.o: $(ROOT_DIR)/%.S | $(BUILD_DIR)
+	@mkdir -p $(dir $@)
+	@echo "Assembling $<"
+	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+
 # ---------------------------------------------------------------------
 # Linking
 # ---------------------------------------------------------------------
 $(BUILD_DIR)/$(TARGET): $(OBJECTS) | $(BUILD_DIR)
 	@echo "Linking $@"
 	$(CC) $(LDFLAGS) -o $@ $^
-#	@echo "Generating BIN"
-#	$(OBJCOPY) -O binary $@ $(BUILD_DIR)/$(BIN)
-#	@echo "Size:"
-#	$(SIZE) $@
 
 #----------------------------------------------------------------------
 # BIN
