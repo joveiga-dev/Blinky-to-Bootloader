@@ -44,6 +44,20 @@ when the MCU boots, it reads a "vector table" from the beginning of flash memory
 
 Vector table for STM32L476 is documented in table. We can see that there are 82 peripheral handlers, in addition to the standard 16.
 
+## Structure of the Project
+- App - implements business logic
+- Common - High level implementations that provides bridges between the drivers (Hardware dependent) and the applications.
+- Drivers - implements hardware specifics that interacts with the MCU peripherals and external components.
+- Modules
+
+## Bootloader
+A Bootloader is the first piece of software that runs when the system powers on. It serves as a bridge between hardware initialization and the main application, providing essential services like hardware setup (clocks, memory, peripherals), application validation, and firmware update mechanism.
+
+### Boot Sequence
+Power-On -> Hardware Reset -> Bootloader -> Application Validation -> Application Jump
+
+
+
 
 
 

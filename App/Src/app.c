@@ -10,10 +10,10 @@
 
 #define UART_INTERVAL_MS    500
 
-void Usart_Init(void)
+USART_Handle huart2;
+
+void Usart2_Init(void)
 {
-    static USART_Handle huart2;
-    
     huart2.Usartx.Port = USART2;
     huart2.Usartx.baud_rate = 9600;
     huart2.Usartx.data_bits = 8;
@@ -31,7 +31,7 @@ void Usart_Init(void)
 
     Userial_Init(&huart2);
 
-    Userial_WriteString(&huart2, "UART READY\r\n");
+    Userial_WriteString(&huart2, "USART READY\r\n");
 }
 
 void App_Init(void)
@@ -40,14 +40,18 @@ void App_Init(void)
     Btn_Init(BTN1);
     SysTick_Init(SYSTICK_LOAD_1MS);
     LedFsm_Init();
-    Usart_Init();
+    Usart2_Init();
+
+    Userial_WriteString(&huart2, "App INIT\r\n");
 }
+
 
 static void Led_Task(void)
 {
     uint32_t current_time = SysTick_GetTimeMs(); 
     LedFsm_Update(current_time);
 }
+
 
 static void Button_Task(void)
 {
@@ -68,63 +72,10 @@ static void Button_Task(void)
     last_btn_state = btn_state;
 }
 
+
+
 void App_Task(void)
 {
     Led_Task();
     Button_Task();
 }
-
-
-/*
- void app_init(void)
- {
-    user_led_init();
-    user_button_init();
-    systick_timer_init(TICKS_FOR_1MS);
-
-    uart_config(USART2, 9600);
-
-    uart_write_string("Button Counter Project Started!\r\n");
-
- }
-
- void app_task(void)
- {
-    static uint32_t last_time = 0;
-    static uint32_t last_uart = 0;
-    button_state_t btn_state = user_button_read();
-    char buffer[50];
-
-    uint32_t current_time = systicktimer_get_current_count();
-
-    if ((current_time - last_time) >= BLINK_INTERVAL_MS) {
-        last_time = current_time;
-
-        if (btn_state != BUTTON_PRESSED) {
-            user_led_toggle(LED_NUM_1);
-        }
-    }
-
-    if (btn_state == BUTTON_PRESSED && last_btn_state == BUTTON_RELEASED){
-        button_press_counter++;
-        user_led_on(LED_NUM_2);
-        //sprintf(buffer, "Counter: %lu\r\n", button_press_counter);
-        //uart_write_string(buffer);
-
-    }
-    else if (btn_state == BUTTON_RELEASED)
-    {
-        user_led_off(LED_NUM_2);
-    }
-
-    last_btn_state = btn_state;
-
-    if ((current_time - last_uart) >= UART_INTERVAL_MS)
-    {
-        last_uart = current_time;
-        sprintf(buffer, "Button pressed: %lu times\r\n", button_press_counter);
-        uart_write_string(buffer);
-    }
-    
-}
-*/ 

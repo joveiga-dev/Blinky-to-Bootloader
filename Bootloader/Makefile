@@ -15,7 +15,7 @@ FLOAT=-mfloat-abi=soft
 #--------------------------------------------------------------------
 # Target
 #-------------------------------------------------------------------
-PROJECT = firmware
+PROJECT = bootloader
 TARGET = $(PROJECT).elf
 BIN = $(PROJECT).bin
 HEX = $(PROJECT).hex
@@ -24,7 +24,7 @@ ROOT_DIR = ..
 BUILD_DIR = $(ROOT_DIR)/Build
 STM32PROGRAMMER_CLI = "/mnt/c/Program Files (x86)/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin/STM32_Programmer_CLI.exe"
 
-LINKER = -T $(ROOT_DIR)/Linkers/STM32L476RG_App.ld
+LINKER = -T $(ROOT_DIR)/Linkers/STM32L476RG_Boot.ld
 MAP_FILE = -Wl,-Map=$(BUILD_DIR)/$(MAP)
 
 #-------------------------------------------------------------------
@@ -44,17 +44,17 @@ LDFLAGS =  $(CPU) -mthumb $(FLOAT) --specs=nosys.specs  $(LINKER) $(MAP_FILE) -g
 #-----------------------------------------------
 # Inludes
 #--------------------------------------------
-INCLUDES = -I$(ROOT_DIR)/App/Inc
+INCLUDES = -I$(ROOT_DIR)/Bootloader/Inc
 INCLUDES += -I$(ROOT_DIR)/Drivers/Inc
 INCLUDES += -I$(ROOT_DIR)/Common/Inc
 
 #---------------------------------------
 # Source Files discovery recursively
 #-----------------------------------
-APP_SRC := $(wildcard $(ROOT_DIR)/App/Src/*.c)
+BOOT_SRC := $(wildcard $(ROOT_DIR)/Bootloader/Src/*.c)
 DRIVERS_SRC := $(wildcard $(ROOT_DIR)/Drivers/Src/*.c)
 COMMON_SRC := $(wildcard $(ROOT_DIR)/Common/Src/*.c)
-SOURCES := $(APP_SRC) $(DRIVERS_SRC) $(COMMON_SRC)
+SOURCES := $(BOOT_SRC) $(DRIVERS_SRC) $(COMMON_SRC)
 
 #---------------------------------------------------------------------------------
 # Object files (mirrored into Build)
