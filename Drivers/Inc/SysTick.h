@@ -15,10 +15,11 @@
 #include <stdint.h>
 #include "Stm32l4xx.h"
 
-#define CLOCK_FREQ        (4000000UL)
-#define SYSTICK_LOAD_1MS (CLOCK_FREQ / 1000UL)
+#define CPU_FREQ        (4000000UL)
+#define SYSTICK_FREQ    (1000UL)
+#define SYSTICK_LOAD_1MS (CPU_FREQ / 1000UL)
 
-extern volatile uint32_t systick_ms;
+//extern volatile uint32_t systick_ms;
 
 /* APIs definitions */
 

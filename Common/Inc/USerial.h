@@ -2,8 +2,16 @@
 #define USERIAL_H_
 
 #include <stdint.h>
+#include <stdbool.h>
+
 #include "Stm32l4xx.h"
 #include "Usart.h"
+
+#define USART2_PORT        (GPIOA)
+#define BR_USART2          (9600)
+#define TX_PIN_USART2      (GPIO_PIN_2)
+#define RX_PIN_USART2      (GPIO_PIN_3)
+#define AF_USART2          (7)
 
 /* GPIO Configuration for USART*/
 typedef struct 
@@ -21,9 +29,15 @@ typedef struct
     USART_GPIO_Config_t Gpiox;
 } USART_Handle;
 
+// APIs
 void Userial_Init(USART_Handle *Husart);
-void Userial_WriteChar(USART_Handle *Husart, char c);
-void Userial_WriteString(USART_Handle *Husart, const char *str);
+void Userial_SendByte(USART_Handle *Husart, uint8_t data);
+void Userial_SendData(USART_Handle *Husart, const uint8_t *data, uint32_t len);
+void Userial_SendString(USART_Handle *Husart, const char *data);
+uint32_t Userial_ReceiveData(uint8_t *data, uint32_t len);
+uint8_t Userial_ReceiveByte(void);
+void Userial_PollReceive(USART_Handle *Husart);
+bool Userial_Data_Available(void);
 
 
 #endif

@@ -9,13 +9,14 @@
 #include "USerial.h"
 
 #define BOOTLOADER_SIZE    (0x8000U)
+
+
 static USART_Handle huart2;
 
 static void Vector_Setup(void)
 {
-    SCB_VTOR_OFFSET = BOOTLOADER_SIZE;
+    SCB_VTOR = BOOTLOADER_SIZE;
 }
-
 
 /**
  * 
@@ -23,23 +24,25 @@ static void Vector_Setup(void)
 void Usart2_Init(void)
 {
     huart2.Usartx.Port = USART2;
-    huart2.Usartx.baud_rate = 9600;
-    huart2.Usartx.data_bits = 8;
-    huart2.Usartx.stop_bits = 1;
-    huart2.Usartx.parity = 0;
-    huart2.Usartx.oversampling = 0;
+    huart2.Usartx.baud_rate = BR_USART2;
+    huart2.Usartx.DataBits = 8;
+    huart2.Usartx.StopBits = 1;
+    huart2.Usartx.Parity = 0;
+    huart2.Usartx.Mode = MODE_TX_RX;
+    huart2.Usartx.HwFlowCtl = HW_CONTROL_NONE;
+    huart2.Usartx.OverSampling = 0;
 
     huart2.Gpiox.TX_Port = GPIOA;
-    huart2.Gpiox.tx_pin = 2;
+    huart2.Gpiox.tx_pin = TX_PIN_USART2;
 
     huart2.Gpiox.RX_Port = GPIOA;
-    huart2.Gpiox.rx_pin = 3;
+    huart2.Gpiox.rx_pin = RX_PIN_USART2;
 
-    huart2.Gpiox.af = 7;
+    huart2.Gpiox.af = AF_USART2;
 
     Userial_Init(&huart2);
 
-    Userial_WriteString(&huart2, "USART READY\r\n");
+    Userial_SendString(&huart2,  "USART Ready\r\n");
 }
 
 /**
@@ -54,7 +57,7 @@ void App_Init(void)
     LedFsm_Init();
     Usart2_Init();
 
-    Userial_WriteString(&huart2, "App INIT\r\n");
+    Userial_SendString(&huart2,  "App INIT\r\n");
 }
 
 
@@ -84,10 +87,23 @@ static void Button_Task(void)
     last_btn_state = btn_state;
 }
 
+static void USart_Task(void)
+{
+    Userial_PollReceive(&huart2);
+    
+    if (Userial_Data_Available())
+    {
+        // Read the data received
+        uint8_t rx = Userial_ReceiveByte();
+        Userial_SendByte(&huart2, rx +1);
+    }
+}
+
 
 
 void App_Task(void)
 {
     Led_Task();
     Button_Task();
+    USart_Task();
 }

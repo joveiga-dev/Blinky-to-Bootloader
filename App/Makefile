@@ -12,6 +12,9 @@ SIZE = $(TC)size
 CPU = -mcpu=cortex-m4
 FLOAT=-mfloat-abi=soft
 
+# Constants for flashing
+BOOT_SIZE = 0x08000000
+
 #--------------------------------------------------------------------
 # Target
 #-------------------------------------------------------------------
@@ -123,7 +126,7 @@ size: $(BUILD_DIR)/$(TARGET)
 # Flashing targets
 # ---------------------------------------------------------------------
 flash:
-	$(STM32PROGRAMMER_CLI) -c port=SWD mode=UR -w $(BUILD_DIR)/$(PROJECT).bin 0x08000000 -rst
+	$(STM32PROGRAMMER_CLI) -c port=SWD mode=UR -w $(BUILD_DIR)/$(PROJECT).bin 0x08000000 -v -rst
 
 dfu:
 	dfu-util -a 0 -s 0x08000000:leave -D $(BUILD_DIR)/$(PROJECT).bin

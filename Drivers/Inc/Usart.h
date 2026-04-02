@@ -38,35 +38,49 @@ typedef enum {
 } USART_Oversampling_t;
 
 typedef enum {
+    MODE_DISABLED,
     MODE_TX,
     MODE_RX,
     MODE_TX_RX
 } USART_Mode_t;
 
+typedef enum {
+    HW_CONTROL_NONE,
+    HW_CONTROL_RTS,
+    HW_CONTROL_CTS,
+    HW_CONTROL_RTS_CTS
+}USART_Hw_Flow_Control_t;
+
 typedef struct
 {
     USART_RegDef_t *Port;
-    uint32_t baud_rate;          
-    USART_Mode_t mode;                   
-    USART_Word_Length_t data_bits;              
-    USART_Stop_Bits_t stop_bits;              
-    USART_Parity_t parity;                
-    USART_Oversampling_t oversampling;
+    uint32_t baud_rate;
+    USART_Word_Length_t DataBits; 
+    USART_Stop_Bits_t StopBits;              
+    USART_Parity_t Parity;          
+    USART_Mode_t Mode;
+    USART_Hw_Flow_Control_t HwFlowCtl;                                                
+    USART_Oversampling_t OverSampling;
 } USART_Config_t;
 
 /* API prototypes */
 int USART_Init(USART_Config_t *Usartx);
 void USART_Clock_Enable(USART_Config_t *Usartx);
 void USART_Clock_Disable(USART_Config_t *UsartX);
+void USART_Enable(USART_Config_t *UsartX);
+void USART_Disable(USART_Config_t *UsartX);
 
-int USART_SetWordLength(USART_RegDef_t *Usartx, USART_Word_Length_t len);
-int USART_SetParity(USART_RegDef_t *Usartx, USART_Parity_t par);
-int USART_SetStopBits(USART_RegDef_t *Usartx, USART_Stop_Bits_t stop);
-int USART_SetOversampling(USART_RegDef_t *Usartx, USART_Oversampling_t over8);
+int USART_SetWordLength(USART_RegDef_t *Usartx, USART_Word_Length_t DataBits);
+int USART_SetParity(USART_RegDef_t *Usartx, USART_Parity_t Parity);
+int USART_SetStopBits(USART_RegDef_t *Usartx, USART_Stop_Bits_t StopBits);
+int USART_SetOversampling(USART_RegDef_t *Usartx, USART_Oversampling_t OverSampling);
+int USART_SetMode(USART_RegDef_t *Usartx, USART_Mode_t Mode);
+int USART_SetFlowControl(USART_RegDef_t *Usartx, USART_Hw_Flow_Control_t FlowControl);
 
 uint32_t USART_Calc_BRR(uint32_t pclk, uint32_t baud, uint8_t over);
 
-void USART_SendByte(USART_RegDef_t *Usartx, uint8_t byte);
-uint8_t USART_ReceiveByte(USART_RegDef_t *Usartx);
+void USART_SendFrame(USART_RegDef_t *Usartx, uint16_t data);
+uint16_t USART_ReceiveFrame(USART_RegDef_t *Usartx);
+
 
 #endif

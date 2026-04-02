@@ -188,6 +188,10 @@ typedef struct {
 #define USART_CR2_STOP_0       (0x1U << 12)
 #define USART_CR2_STOP_1       (0x1U << 13)
 
+#define USART_CR3_RTSE         BIT(8)
+#define USART_CR3_CTSE         BIT(9)
+
+
 /* Systick (system timer) Definitions */
 
 #define SYSTICK_CSR_ENABLE       (BIT(0U))       /* Enables the counter: 0-> counter disabled, 1 counter enabled.*/
@@ -228,9 +232,9 @@ typedef struct {
 /**
  * System Control Block (SCB)
  */
-
 #define SCB_BASE                  (0xE000ED00UL)
-#define SCB_VTOR_OFFSET           MMIO32(SCB_BASE + 0x08U)
+/* VTOR:  Vector Table Offset Register */
+#define SCB_VTOR                  MMIO32(SCB_BASE + 0x08U)
 
 
 

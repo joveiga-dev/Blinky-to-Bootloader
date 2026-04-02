@@ -16,37 +16,29 @@ extern uint32_t _sbss, _ebss;
 extern uint32_t _sdata, _edata;
 extern uint32_t _etext;
 
-/**
- * 
- */
-void check_stack_usage(void);
-
-/**
- * Main function
- */
 int main(void);
-
-/**
- * Initial program counter. The address where we want to start execution
- */
 void Reset_Handler(void);
 void Default_Handler(void);
 
 typedef void (*Interrupt_Handler)(void);
-void NMI_Handler             (void) __attribute__ ((weak, alias("Default_Handler")));
-void HardFault_Handler       (void) __attribute__ ((weak, alias("Default_Handler")));
-void MemManage_Handler             (void) __attribute__ ((weak, alias("Default_Handler")));
-void BusFault_Handler             (void) __attribute__ ((weak, alias("Default_Handler")));
-void UsageFault_Handler             (void) __attribute__ ((weak, alias("Default_Handler")));
-void SVCall_Handler             (void) __attribute__ ((weak, alias("Default_Handler")));
-void DebugMonitor_Handler             (void) __attribute__ ((weak, alias("Default_Handler")));
-void PendSV_Handler             (void) __attribute__ ((weak, alias("Default_Handler")));
-void SysTick_Handler             (void) __attribute__ ((weak, alias("Default_Handler")));
 
+void NMI_Handler                             (void) __attribute__ ((weak, alias("Default_Handler")));
+void HardFault_Handler                       (void) __attribute__ ((weak, alias("Default_Handler")));
+void MemManage_Handler                       (void) __attribute__ ((weak, alias("Default_Handler")));
+void BusFault_Handler                        (void) __attribute__ ((weak, alias("Default_Handler")));
+void UsageFault_Handler                      (void) __attribute__ ((weak, alias("Default_Handler")));
+void SVCall_Handler                          (void) __attribute__ ((weak, alias("Default_Handler")));
+void DebugMonitor_Handler                    (void) __attribute__ ((weak, alias("Default_Handler")));
+void PendSV_Handler                          (void) __attribute__ ((weak, alias("Default_Handler")));
+void SysTick_Handler                         (void) __attribute__ ((weak, alias("Default_Handler")));
+
+
+void Usart2_IRQ_Handler                       (void) __attribute__ ((weak, alias("Default_Handler")));          
 /**
  * Initial interrupt vector table
  */
-__attribute__((section(".vectors"), used)) const Interrupt_Handler vectors[] = {
+__attribute__((section(".vectors"), used))
+const Interrupt_Handler vectors[] = {
     (Interrupt_Handler) STACK_TOP,                   /* &_esram Top of stack 96K */
     Reset_Handler,                                   /* Reset Handler */
     NMI_Handler,                                     /* NMI */
@@ -97,19 +89,5 @@ void Default_Handler(void)
     while (1) (void) 0;
 }
 
-/*
-void check_stack_usage(void)
-{
-    uint8_t *stack_ptr;
-    asm volatile ("mov %0, sp" : "=r" (stack_ptr));
-
-    // Calculate Stack Usage
-    uint32_t stack_used = STACK_TOP - (uint32_t)stack_ptr;
-    if (stack_used > STACK_SIZE -1024)
-    {
-        // Stack nearly full - take action
-    }
-}
-*/
 
 

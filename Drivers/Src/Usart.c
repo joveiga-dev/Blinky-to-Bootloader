@@ -74,15 +74,35 @@ void USART_Clock_Disable(USART_Config_t *Usartx)
     }
 }
 
+void USART_Enable(USART_Config_t *Usartx)
+{
+    if ((Usartx == NULL) || (Usartx->Port == NULL))
+    {
+        return;
+    }
+
+    Usartx->Port->USART_CR1 |= USART_CR1_UE;
+}
+
+void USART_Disable(USART_Config_t *Usartx)
+{
+    if ((Usartx == NULL) || (Usartx->Port == NULL))
+    {
+        return;
+    }
+
+    Usartx->Port->USART_CR1 &= ~USART_CR1_UE;
+}
+
 /**
  * @brief USART_Set_Word_Length
  */
-int USART_SetWordLength(USART_RegDef_t *Usartx, USART_Word_Length_t len)
+int USART_SetWordLength(USART_RegDef_t *Usartx, USART_Word_Length_t DataBits)
 {   
-    if (!Usartx || len > 3) return -1;
+    if (!Usartx || DataBits > 3) return -1;
 
     Usartx->USART_CR1 &= ~(USART_CR1_M0 | USART_CR1_M1);
-    switch (len)
+    switch (DataBits)
     {
     case WORDLENGTH_BIT_8:
         /* M1M0 = 00 */
@@ -103,14 +123,14 @@ int USART_SetWordLength(USART_RegDef_t *Usartx, USART_Word_Length_t len)
  * @details Configure Parity Enable (PCE) , Parity Type (PS = even/odd)
  * The USART must be disabled before configuring (UE = 0)
  */
-int USART_SetParity(USART_RegDef_t *Usartx, USART_Parity_t par)
+int USART_SetParity(USART_RegDef_t *Usartx, USART_Parity_t Parity)
 {
-    if (!Usartx || par > 4) return -1;
+    if (!Usartx || Parity > 4) return -1;
 
     //Usartx->USART_CR1 &= ~USART_CR1_UE;
     Usartx->USART_CR1 &= ~(USART_CR1_PCE | USART_CR1_PS);
     
-    switch (par)
+    switch (Parity)
     {
     case PARITY_NONE:
         /* PCE 0 PS X */
@@ -130,13 +150,12 @@ int USART_SetParity(USART_RegDef_t *Usartx, USART_Parity_t par)
  * @brief USART_Set_Stop_Bits 
  * @details The USART must be disabled before configuring (UE = 0)
  */
-int USART_SetStopBits(USART_RegDef_t *Usartx, USART_Stop_Bits_t stop)
+int USART_SetStopBits(USART_RegDef_t *Usartx, USART_Stop_Bits_t StopBits)
 {
-    if (!Usartx || stop > 4) return -1;
+    if (!Usartx || StopBits > 4) return -1;
 
-    //Usartx->USART_CR1 &= ~USART_CR1_UE;
     Usartx->USART_CR2 &= ~(USART_CR2_STOP);
-    switch (stop)
+    switch (StopBits)
     {
     case STOPBITS_1:
         break;
@@ -158,18 +177,73 @@ int USART_SetStopBits(USART_RegDef_t *Usartx, USART_Stop_Bits_t stop)
  * @brief Oversampling Uart settings
  * @details The USART must be disabled before configuring (UE = 0)
  */
-int USART_SetOversampling(USART_RegDef_t *Usartx, USART_Oversampling_t over8)
+int USART_SetOversampling(USART_RegDef_t *Usartx, USART_Oversampling_t OverSampling)
 {
-    if (!Usartx || over8 > 2) return -1;
+    if (!Usartx || OverSampling > 2) return -1;
 
     //Usartx->USART_CR1 &= ~USART_CR1_UE;
-    if (over8 == OVERSAMPLING_16)
+    if (OverSampling == OVERSAMPLING_16)
     {
         Usartx->USART_CR1 &= ~USART_CR1_OVER8;
     }
     else
     {
         Usartx->USART_CR1 |= USART_CR1_OVER8;
+    }
+
+    return 0;
+}
+
+/**
+ * @brief USART Transfer Mode
+ */
+int USART_SetMode(USART_RegDef_t *Usartx, USART_Mode_t Mode)
+{
+    if(!Usartx || Mode > 4) return -1;
+
+    Usartx->USART_CR2 &= ~(USART_CR1_TE | USART_CR1_RE);
+
+    switch (Mode)
+    {
+    case MODE_DISABLED:
+        break;
+    case MODE_TX:
+        Usartx->USART_CR1 |= USART_CR1_TE;
+        break;
+    case MODE_RX:
+        Usartx->USART_CR2 |= USART_CR1_RE; 
+        break;
+    case MODE_TX_RX:
+        Usartx->USART_CR2 |= (USART_CR1_TE | USART_CR1_RE); 
+        break;
+    }
+
+    return 0;
+
+}
+
+/**
+ * @details Hw_Flow_Control UART Hardware Flow Control
+ */
+int USART_SetFlowControl(USART_RegDef_t *Usartx, USART_Hw_Flow_Control_t FlowControl)
+{
+    if(!Usartx || FlowControl > 4) return -1;
+
+    Usartx->USART_CR3 &= ~(USART_CR3_CTSE | USART_CR3_RTSE);
+
+    switch (FlowControl)
+    {
+    case HW_CONTROL_NONE:
+        break;
+    case HW_CONTROL_RTS:
+        Usartx->USART_CR1 |= USART_CR3_RTSE;
+        break;
+    case HW_CONTROL_CTS:
+        Usartx->USART_CR2 |= USART_CR3_CTSE; 
+        break;
+    case HW_CONTROL_RTS_CTS:
+        Usartx->USART_CR2 |= (USART_CR3_CTSE | USART_CR3_RTSE); 
+        break;
     }
 
     return 0;
@@ -198,39 +272,70 @@ int USART_Init(USART_Config_t *Usartx)
     Usartx->Port->USART_CR1 &= ~USART_CR1_UE; // Disable Uart
 
     // Configure Settings
-    USART_SetParity(Usartx->Port, Usartx->parity);
-    USART_SetWordLength(Usartx->Port, Usartx->data_bits);
-    USART_SetStopBits(Usartx->Port, Usartx->stop_bits);
-    USART_SetOversampling(Usartx->Port, Usartx->oversampling);
+    USART_SetWordLength(Usartx->Port, Usartx->DataBits);
+    USART_SetStopBits(Usartx->Port, Usartx->StopBits);
+    USART_SetParity(Usartx->Port, Usartx->Parity);
+    USART_SetMode(Usartx->Port, Usartx->Mode);
+    USART_SetFlowControl(Usartx->Port, Usartx->HwFlowCtl);
+    USART_SetOversampling(Usartx->Port, Usartx->OverSampling);
     
     // TODO: Replace with real clock when implemented Rcc Driver
-    uint32_t pclk = 4000000;
-    Usartx->Port->USART_BRR = USART_Calc_BRR(pclk, Usartx->baud_rate, Usartx->oversampling);
+    uint32_t pclk = CPU_FREQ;
+    Usartx->Port->USART_BRR = USART_Calc_BRR(pclk, Usartx->baud_rate, Usartx->OverSampling);
 
     Usartx->Port->USART_CR1 |= USART_CR1_RE | USART_CR1_TE;
 
-    Usartx->Port->USART_CR1 |= USART_CR1_UE;
+    //Usartx->Port->USART_CR1 |= USART_CR1_UE;
+    USART_Enable(Usartx);
 
     return 0;
 }
 
-
-void USART_SendByte(USART_RegDef_t *Usartx, uint8_t byte)
+/**
+ * @brief Sends a single byte over Uart
+ * 
+ * This function writes on byte to the Uart data register. It waits for the transmit data register to be empty (TXE flag) 
+ * 
+ * @param Usartx     Pointer to USART peripheral.
+ * @param byte       Byte to be transmitted.
+ * 
+ * @note Low-level helper function used by higher-level functions.
+ * 
+ * @retval None
+ */
+void USART_SendFrame(USART_RegDef_t *Usartx, uint16_t data)
 {
-    if(!Usartx ) return;
+    if((Usartx == NULL) || (data == 0U))
+    {
+        return;
+    }
 
     while(!(Usartx->USART_ISR & USART_ISR_TXE));
 
-    // Write data to transmit register
-    Usartx->USART_TDR = byte;
+    Usartx->USART_TDR = data;
 }
 
-uint8_t USART_ReceiveByte(USART_RegDef_t *Usartx)
+/**
+ * @brief Receives a single byte over Uart
+ * 
+ * This function reads on byte to the Uart data register. It waits for the receive data register not empty (RXNE flag) 
+ * 
+ * @param Usartx     Pointer to USART peripheral.
+ * 
+ * @note Low-level helper function used by higher-level functions.
+ * 
+ * @retval None
+ */
+uint16_t USART_ReceiveFrame(USART_RegDef_t *Usartx)
 {
-    // Wait for receive data register not empty
+    if(Usartx == NULL)
+    {
+        return 0;
+    }
+
     while(!(Usartx->USART_ISR & USART_ISR_RXNE));
-    // Read data
-    return (uint8_t)(Usartx->USART_RDR & 0xFF);
+
+    return (uint16_t)(Usartx->USART_RDR & 0xFF);
 }
 
 

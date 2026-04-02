@@ -2,8 +2,7 @@
 #include "Stm32l4xx.h"
 #include <stdint.h>
 
-volatile uint32_t systick_ms = 0;
-//static void (*SysTick_Callback)(void) = 0;
+static volatile uint32_t systick_ms = 0;
 
 /**
  * @brief    system tick init
@@ -77,6 +76,7 @@ void Delay_Ms(uint32_t ms)
     while ((systick_ms - start) < ms)
     {
         __asm volatile ("wfi");
+        // Spin
     }
     
 }
