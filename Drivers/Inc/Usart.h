@@ -10,6 +10,7 @@
 #define DRIVER_UART_H_
 
 #include <stdint.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include "stm32l4xx.h"
 
@@ -66,9 +67,10 @@ typedef struct
 /* API prototypes */
 int USART_Init(USART_Config_t *Usartx);
 void USART_Clock_Enable(USART_Config_t *Usartx);
-void USART_Clock_Disable(USART_Config_t *UsartX);
-void USART_Enable(USART_Config_t *UsartX);
-void USART_Disable(USART_Config_t *UsartX);
+void USART_Clock_Disable(USART_Config_t *Usartx);
+void USART_Enable(USART_Config_t *Usartx);
+void USART_Disable(USART_Config_t *Usartx);
+void USART_EnableRxInterrupt(USART_Config_t *Usartx);
 
 int USART_SetWordLength(USART_RegDef_t *Usartx, USART_Word_Length_t DataBits);
 int USART_SetParity(USART_RegDef_t *Usartx, USART_Parity_t Parity);
@@ -80,7 +82,9 @@ int USART_SetFlowControl(USART_RegDef_t *Usartx, USART_Hw_Flow_Control_t FlowCon
 uint32_t USART_Calc_BRR(uint32_t pclk, uint32_t baud, uint8_t over);
 
 void USART_SendFrame(USART_RegDef_t *Usartx, uint16_t data);
+uint16_t USART_ReceivePollFrame(USART_RegDef_t *Usartx);
 uint16_t USART_ReceiveFrame(USART_RegDef_t *Usartx);
+bool USART_RxIsReady(USART_RegDef_t *Usartx);
 
 
 #endif

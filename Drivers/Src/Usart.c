@@ -3,6 +3,9 @@
 #include "Stm32l4xx.h"
 #include "Rcc.h"
 #include "SysTick.h"
+#include "Nvic.h"
+
+//#include <stdbool.h>
 
 /**
  * @brief Enable Clock of the Usart
@@ -76,7 +79,7 @@ void USART_Clock_Disable(USART_Config_t *Usartx)
 
 void USART_Enable(USART_Config_t *Usartx)
 {
-    if ((Usartx == NULL) || (Usartx->Port == NULL))
+    if (Usartx == NULL)
     {
         return;
     }
@@ -92,6 +95,16 @@ void USART_Disable(USART_Config_t *Usartx)
     }
 
     Usartx->Port->USART_CR1 &= ~USART_CR1_UE;
+}
+
+void USART_EnableRxInterrupt(USART_Config_t *Usartx)
+{
+    if ((Usartx == NULL) || (Usartx->Port == NULL))
+    {
+        return;
+    }
+
+    Usartx->Port->USART_CR1 |= USART_CR1_RXNEIE;
 }
 
 /**
@@ -285,7 +298,9 @@ int USART_Init(USART_Config_t *Usartx)
 
     Usartx->Port->USART_CR1 |= USART_CR1_RE | USART_CR1_TE;
 
-    //Usartx->Port->USART_CR1 |= USART_CR1_UE;
+    USART_EnableRxInterrupt(Usartx);
+    NVIC_EnableIRQ(USART2_IRQn);
+
     USART_Enable(Usartx);
 
     return 0;
@@ -318,7 +333,7 @@ void USART_SendFrame(USART_RegDef_t *Usartx, uint16_t data)
 /**
  * @brief Receives a single byte over Uart
  * 
- * This function reads on byte to the Uart data register. It waits for the receive data register not empty (RXNE flag) 
+ * This function reads on byte to the Uart data register. It waits for the receive data register not empty (RXNE flag) Blocking
  * 
  * @param Usartx     Pointer to USART peripheral.
  * 
@@ -326,7 +341,7 @@ void USART_SendFrame(USART_RegDef_t *Usartx, uint16_t data)
  * 
  * @retval None
  */
-uint16_t USART_ReceiveFrame(USART_RegDef_t *Usartx)
+uint16_t USART_ReceivePollFrame(USART_RegDef_t *Usartx)
 {
     if(Usartx == NULL)
     {
@@ -335,6 +350,16 @@ uint16_t USART_ReceiveFrame(USART_RegDef_t *Usartx)
 
     while(!(Usartx->USART_ISR & USART_ISR_RXNE));
 
+    return (uint16_t)(Usartx->USART_RDR & 0xFF);
+}
+
+bool USART_RxIsReady(USART_RegDef_t *Usartx)
+{
+    return (Usartx->USART_ISR & USART_ISR_RXNE) != 0;
+}
+
+uint16_t USART_ReceiveFrame(USART_RegDef_t *Usartx)
+{
     return (uint16_t)(Usartx->USART_RDR & 0xFF);
 }
 

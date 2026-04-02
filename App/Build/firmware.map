@@ -429,6 +429,11 @@ Discarded input sections
                 0x00000000       0x22 Build/Drivers/Src/Gpio.o
  .text.GPIO_ResetPort
                 0x00000000       0x26 Build/Drivers/Src/Gpio.o
+ .text          0x00000000        0x0 Build/Drivers/Src/Nvic.o
+ .data          0x00000000        0x0 Build/Drivers/Src/Nvic.o
+ .bss           0x00000000        0x0 Build/Drivers/Src/Nvic.o
+ .text.NVIC_DisableIRQ
+                0x00000000       0x38 Build/Drivers/Src/Nvic.o
  .text          0x00000000        0x0 Build/Drivers/Src/SysTick.o
  .data          0x00000000        0x0 Build/Drivers/Src/SysTick.o
  .bss           0x00000000        0x0 Build/Drivers/Src/SysTick.o
@@ -449,6 +454,8 @@ Discarded input sections
                 0x00000000       0xc0 Build/Drivers/Src/Usart.o
  .text.USART_Disable
                 0x00000000       0x32 Build/Drivers/Src/Usart.o
+ .text.USART_ReceivePollFrame
+                0x00000000       0x34 Build/Drivers/Src/Usart.o
  .text          0x00000000        0x0 Build/Common/Src/Button.o
  .data          0x00000000        0x0 Build/Common/Src/Button.o
  .bss           0x00000000        0x0 Build/Common/Src/Button.o
@@ -473,6 +480,8 @@ Discarded input sections
  .bss           0x00000000        0x0 Build/Common/Src/USerial.o
  .text.Userial_SendData
                 0x00000000       0x5a Build/Common/Src/USerial.o
+ .text.Userial_PollReceive
+                0x00000000       0x40 Build/Common/Src/USerial.o
  .text.Userial_ReceiveData
                 0x00000000       0x4c Build/Common/Src/USerial.o
  .text          0x00000000        0x0 Build/App/Src/Bootloader.o
@@ -616,6 +625,7 @@ LOAD Build/App/Src/App.o
 LOAD Build/App/Src/Main.o
 LOAD Build/Linkers/Startup.o
 LOAD Build/Drivers/Src/Gpio.o
+LOAD Build/Drivers/Src/Nvic.o
 LOAD Build/Drivers/Src/SysTick.o
 LOAD Build/Drivers/Src/Usart.o
 LOAD Build/Common/Src/Button.o
@@ -642,240 +652,280 @@ END GROUP
 LOAD /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m/nofp/crtend.o
 LOAD /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m/nofp/crtn.o
 
-.text           0x08000000     0x90e4
+.text           0x08000000     0x91bc
                 0x08000000                        . = ALIGN (0x4)
  *(.bootloader_section)
  .bootloader_section
                 0x08000000     0x8000 Build/App/Src/Bootloader.o
                 0x08008000                        . = ALIGN (0x4)
  *(.vectors)
- .vectors       0x08008000       0x40 Build/Linkers/Startup.o
+ .vectors       0x08008000       0xdc Build/Linkers/Startup.o
                 0x08008000                vectors
-                0x08008040                        . = ALIGN (0x4)
+                0x080080dc                        . = ALIGN (0x4)
  *(.text*)
  .text.Vector_Setup
-                0x08008040       0x18 Build/App/Src/App.o
+                0x080080dc       0x18 Build/App/Src/App.o
  .text.Usart2_Init
-                0x08008058       0x78 Build/App/Src/App.o
-                0x08008058                Usart2_Init
+                0x080080f4       0x78 Build/App/Src/App.o
+                0x080080f4                Usart2_Init
  .text.App_Init
-                0x080080d0       0x38 Build/App/Src/App.o
-                0x080080d0                App_Init
+                0x0800816c       0x38 Build/App/Src/App.o
+                0x0800816c                App_Init
  .text.Led_Task
-                0x08008108       0x1a Build/App/Src/App.o
- *fill*         0x08008122        0x2 
+                0x080081a4       0x1a Build/App/Src/App.o
+ *fill*         0x080081be        0x2 
  .text.Button_Task
-                0x08008124       0x54 Build/App/Src/App.o
- .text.USart_Task
-                0x08008178       0x50 Build/App/Src/App.o
+                0x080081c0       0x54 Build/App/Src/App.o
+ .text.USart_InterruptTask
+                0x08008214       0x34 Build/App/Src/App.o
  .text.App_Task
-                0x080081c8       0x14 Build/App/Src/App.o
-                0x080081c8                App_Task
- .text.main     0x080081dc        0xe Build/App/Src/Main.o
-                0x080081dc                main
- *fill*         0x080081ea        0x2 
+                0x08008248       0x14 Build/App/Src/App.o
+                0x08008248                App_Task
+ .text.main     0x0800825c        0xe Build/App/Src/Main.o
+                0x0800825c                main
+ *fill*         0x0800826a        0x2 
  .text.Reset_Handler
-                0x080081ec       0x60 Build/Linkers/Startup.o
-                0x080081ec                Reset_Handler
+                0x0800826c       0x60 Build/Linkers/Startup.o
+                0x0800826c                Reset_Handler
  .text.Default_Handler
-                0x0800824c        0x8 Build/Linkers/Startup.o
-                0x0800824c                SVCall_Handler
-                0x0800824c                HardFault_Handler
-                0x0800824c                PendSV_Handler
-                0x0800824c                NMI_Handler
-                0x0800824c                Usart2_IRQ_Handler
-                0x0800824c                UsageFault_Handler
-                0x0800824c                Default_Handler
-                0x0800824c                MemManage_Handler
-                0x0800824c                BusFault_Handler
-                0x0800824c                DebugMonitor_Handler
+                0x080082cc        0x8 Build/Linkers/Startup.o
+                0x080082cc                EXTI2_IRQHandler
+                0x080082cc                SVCall_Handler
+                0x080082cc                TIM1_CC_IRQHandler
+                0x080082cc                HardFault_Handler
+                0x080082cc                DMA1_Stream5_IRQHandler
+                0x080082cc                TAMP_STAMP_IRQHandler
+                0x080082cc                PendSV_Handler
+                0x080082cc                NMI_Handler
+                0x080082cc                EXTI3_IRQHandler
+                0x080082cc                TIM1_UP_TIM10_IRQHandler
+                0x080082cc                EXTI0_IRQHandler
+                0x080082cc                I2C2_EV_IRQHandler
+                0x080082cc                DMA1_Stream2_IRQHandler
+                0x080082cc                UsageFault_Handler
+                0x080082cc                SPI1_IRQHandler
+                0x080082cc                TIM1_BRK_TIM9_IRQHandler
+                0x080082cc                TIM4_IRQHandler
+                0x080082cc                I2C1_EV_IRQHandler
+                0x080082cc                DMA1_Stream6_IRQHandler
+                0x080082cc                DMA1_Stream1_IRQHandler
+                0x080082cc                TIM3_IRQHandler
+                0x080082cc                RCC_IRQHandler
+                0x080082cc                Default_Handler
+                0x080082cc                ADC_IRQHandler
+                0x080082cc                EXTI9_5_IRQHandler
+                0x080082cc                SPI2_IRQHandler
+                0x080082cc                MemManage_Handler
+                0x080082cc                DMA1_Stream0_IRQHandler
+                0x080082cc                EXTI4_IRQHandler
+                0x080082cc                EXTI22_RTC_WKUP_IRQHandler
+                0x080082cc                TIM2_IRQHandler
+                0x080082cc                EXTI16_PVD_IRQHandler
+                0x080082cc                TIM1_TRG_COM_TIM11_IRQHandler
+                0x080082cc                EXTI1_IRQHandler
+                0x080082cc                I2C2_ER_IRQHandler
+                0x080082cc                FLASH_IRQHandler
+                0x080082cc                BusFault_Handler
+                0x080082cc                USART1_IRQHandler
+                0x080082cc                DMA1_Stream4_IRQHandler
+                0x080082cc                I2C1_ER_IRQHandler
+                0x080082cc                DebugMonitor_Handler
+                0x080082cc                DMA1_Stream3_IRQHandler
  .text.GPIO_Clock_Enable
-                0x08008254       0x3c Build/Drivers/Src/Gpio.o
-                0x08008254                GPIO_Clock_Enable
+                0x080082d4       0x3c Build/Drivers/Src/Gpio.o
+                0x080082d4                GPIO_Clock_Enable
  .text.GPIO_SetPin
-                0x08008290       0x20 Build/Drivers/Src/Gpio.o
-                0x08008290                GPIO_SetPin
+                0x08008310       0x20 Build/Drivers/Src/Gpio.o
+                0x08008310                GPIO_SetPin
  .text.GPIO_ResetPin
-                0x080082b0       0x22 Build/Drivers/Src/Gpio.o
-                0x080082b0                GPIO_ResetPin
+                0x08008330       0x22 Build/Drivers/Src/Gpio.o
+                0x08008330                GPIO_ResetPin
  .text.GPIO_TogglePin
-                0x080082d2       0x4c Build/Drivers/Src/Gpio.o
-                0x080082d2                GPIO_TogglePin
+                0x08008352       0x4c Build/Drivers/Src/Gpio.o
+                0x08008352                GPIO_TogglePin
  .text.GPIO_SetPinMode
-                0x0800831e       0x5e Build/Drivers/Src/Gpio.o
-                0x0800831e                GPIO_SetPinMode
+                0x0800839e       0x5e Build/Drivers/Src/Gpio.o
+                0x0800839e                GPIO_SetPinMode
  .text.GPIO_WritePin
-                0x0800837c       0x42 Build/Drivers/Src/Gpio.o
-                0x0800837c                GPIO_WritePin
+                0x080083fc       0x42 Build/Drivers/Src/Gpio.o
+                0x080083fc                GPIO_WritePin
  .text.GPIO_ReadPin
-                0x080083be       0x3e Build/Drivers/Src/Gpio.o
-                0x080083be                GPIO_ReadPin
+                0x0800843e       0x3e Build/Drivers/Src/Gpio.o
+                0x0800843e                GPIO_ReadPin
  .text.GPIO_SetPinPull
-                0x080083fc       0x5e Build/Drivers/Src/Gpio.o
-                0x080083fc                GPIO_SetPinPull
+                0x0800847c       0x5e Build/Drivers/Src/Gpio.o
+                0x0800847c                GPIO_SetPinPull
  .text.GPIO_SetPinAF
-                0x0800845a       0x82 Build/Drivers/Src/Gpio.o
-                0x0800845a                GPIO_SetPinAF
+                0x080084da       0x82 Build/Drivers/Src/Gpio.o
+                0x080084da                GPIO_SetPinAF
  .text.GPIO_SetPinOutputSpeed
-                0x080084dc       0x5e Build/Drivers/Src/Gpio.o
-                0x080084dc                GPIO_SetPinOutputSpeed
+                0x0800855c       0x5e Build/Drivers/Src/Gpio.o
+                0x0800855c                GPIO_SetPinOutputSpeed
  .text.GPIO_SetPinOutputType
-                0x0800853a       0x5c Build/Drivers/Src/Gpio.o
-                0x0800853a                GPIO_SetPinOutputType
+                0x080085ba       0x5c Build/Drivers/Src/Gpio.o
+                0x080085ba                GPIO_SetPinOutputType
  .text.GPIO_Init
-                0x08008596       0xa2 Build/Drivers/Src/Gpio.o
-                0x08008596                GPIO_Init
+                0x08008616       0xa2 Build/Drivers/Src/Gpio.o
+                0x08008616                GPIO_Init
+ .text.NVIC_EnableIRQ
+                0x080086b8       0x38 Build/Drivers/Src/Nvic.o
+                0x080086b8                NVIC_EnableIRQ
  .text.SysTick_Init
-                0x08008638       0x3c Build/Drivers/Src/SysTick.o
-                0x08008638                SysTick_Init
+                0x080086f0       0x3c Build/Drivers/Src/SysTick.o
+                0x080086f0                SysTick_Init
  .text.SysTick_Handler
-                0x08008674       0x1c Build/Drivers/Src/SysTick.o
-                0x08008674                SysTick_Handler
+                0x0800872c       0x1c Build/Drivers/Src/SysTick.o
+                0x0800872c                SysTick_Handler
  .text.SysTick_GetTick
-                0x08008690       0x1c Build/Drivers/Src/SysTick.o
-                0x08008690                SysTick_GetTick
+                0x08008748       0x1c Build/Drivers/Src/SysTick.o
+                0x08008748                SysTick_GetTick
  .text.SysTick_GetTimeMs
-                0x080086ac        0xe Build/Drivers/Src/SysTick.o
-                0x080086ac                SysTick_GetTimeMs
- *fill*         0x080086ba        0x2 
+                0x08008764        0xe Build/Drivers/Src/SysTick.o
+                0x08008764                SysTick_GetTimeMs
+ *fill*         0x08008772        0x2 
  .text.USART_Clock_Enable
-                0x080086bc       0xc0 Build/Drivers/Src/Usart.o
-                0x080086bc                USART_Clock_Enable
+                0x08008774       0xc0 Build/Drivers/Src/Usart.o
+                0x08008774                USART_Clock_Enable
  .text.USART_Enable
-                0x0800877c       0x32 Build/Drivers/Src/Usart.o
-                0x0800877c                USART_Enable
+                0x08008834       0x2a Build/Drivers/Src/Usart.o
+                0x08008834                USART_Enable
+ .text.USART_EnableRxInterrupt
+                0x0800885e       0x32 Build/Drivers/Src/Usart.o
+                0x0800885e                USART_EnableRxInterrupt
  .text.USART_SetWordLength
-                0x080087ae       0x66 Build/Drivers/Src/Usart.o
-                0x080087ae                USART_SetWordLength
+                0x08008890       0x66 Build/Drivers/Src/Usart.o
+                0x08008890                USART_SetWordLength
  .text.USART_SetParity
-                0x08008814       0x66 Build/Drivers/Src/Usart.o
-                0x08008814                USART_SetParity
- *fill*         0x0800887a        0x2 
+                0x080088f6       0x66 Build/Drivers/Src/Usart.o
+                0x080088f6                USART_SetParity
  .text.USART_SetStopBits
-                0x0800887c       0x80 Build/Drivers/Src/Usart.o
-                0x0800887c                USART_SetStopBits
+                0x0800895c       0x80 Build/Drivers/Src/Usart.o
+                0x0800895c                USART_SetStopBits
  .text.USART_SetOversampling
-                0x080088fc       0x4a Build/Drivers/Src/Usart.o
-                0x080088fc                USART_SetOversampling
- *fill*         0x08008946        0x2 
+                0x080089dc       0x4a Build/Drivers/Src/Usart.o
+                0x080089dc                USART_SetOversampling
+ *fill*         0x08008a26        0x2 
  .text.USART_SetMode
-                0x08008948       0x80 Build/Drivers/Src/Usart.o
-                0x08008948                USART_SetMode
+                0x08008a28       0x80 Build/Drivers/Src/Usart.o
+                0x08008a28                USART_SetMode
  .text.USART_SetFlowControl
-                0x080089c8       0x80 Build/Drivers/Src/Usart.o
-                0x080089c8                USART_SetFlowControl
+                0x08008aa8       0x80 Build/Drivers/Src/Usart.o
+                0x08008aa8                USART_SetFlowControl
  .text.USART_Calc_BRR
-                0x08008a48       0x3e Build/Drivers/Src/Usart.o
-                0x08008a48                USART_Calc_BRR
- *fill*         0x08008a86        0x2 
+                0x08008b28       0x3e Build/Drivers/Src/Usart.o
+                0x08008b28                USART_Calc_BRR
+ *fill*         0x08008b66        0x2 
  .text.USART_Init
-                0x08008a88       0xd0 Build/Drivers/Src/Usart.o
-                0x08008a88                USART_Init
+                0x08008b68       0xdc Build/Drivers/Src/Usart.o
+                0x08008b68                USART_Init
  .text.USART_SendFrame
-                0x08008b58       0x38 Build/Drivers/Src/Usart.o
-                0x08008b58                USART_SendFrame
+                0x08008c44       0x38 Build/Drivers/Src/Usart.o
+                0x08008c44                USART_SendFrame
+ .text.USART_RxIsReady
+                0x08008c7c       0x24 Build/Drivers/Src/Usart.o
+                0x08008c7c                USART_RxIsReady
  .text.USART_ReceiveFrame
-                0x08008b90       0x34 Build/Drivers/Src/Usart.o
-                0x08008b90                USART_ReceiveFrame
+                0x08008ca0       0x1c Build/Drivers/Src/Usart.o
+                0x08008ca0                USART_ReceiveFrame
  .text.Btn_Init
-                0x08008bc4       0x48 Build/Common/Src/Button.o
-                0x08008bc4                Btn_Init
+                0x08008cbc       0x48 Build/Common/Src/Button.o
+                0x08008cbc                Btn_Init
  .text.Btn_Read
-                0x08008c0c       0x48 Build/Common/Src/Button.o
-                0x08008c0c                Btn_Read
+                0x08008d04       0x48 Build/Common/Src/Button.o
+                0x08008d04                Btn_Read
  .text.Led_Init
-                0x08008c54       0x58 Build/Common/Src/Led.o
-                0x08008c54                Led_Init
+                0x08008d4c       0x58 Build/Common/Src/Led.o
+                0x08008d4c                Led_Init
  .text.Led_InitAllLeds
-                0x08008cac       0x2a Build/Common/Src/Led.o
-                0x08008cac                Led_InitAllLeds
+                0x08008da4       0x2a Build/Common/Src/Led.o
+                0x08008da4                Led_InitAllLeds
  .text.Led_Write
-                0x08008cd6       0x52 Build/Common/Src/Led.o
- .text.Led_On   0x08008d28       0x30 Build/Common/Src/Led.o
-                0x08008d28                Led_On
- .text.Led_Off  0x08008d58       0x30 Build/Common/Src/Led.o
-                0x08008d58                Led_Off
+                0x08008dce       0x52 Build/Common/Src/Led.o
+ .text.Led_On   0x08008e20       0x30 Build/Common/Src/Led.o
+                0x08008e20                Led_On
+ .text.Led_Off  0x08008e50       0x30 Build/Common/Src/Led.o
+                0x08008e50                Led_Off
  .text.Led_Toggle
-                0x08008d88       0x38 Build/Common/Src/Led.o
-                0x08008d88                Led_Toggle
+                0x08008e80       0x38 Build/Common/Src/Led.o
+                0x08008e80                Led_Toggle
  .text.LedFsm_Init
-                0x08008dc0       0x20 Build/Common/Src/Led_fsm.o
-                0x08008dc0                LedFsm_Init
+                0x08008eb8       0x20 Build/Common/Src/Led_fsm.o
+                0x08008eb8                LedFsm_Init
  .text.LedFsm_EventHandle
-                0x08008de0       0x30 Build/Common/Src/Led_fsm.o
-                0x08008de0                LedFsm_EventHandle
+                0x08008ed8       0x30 Build/Common/Src/Led_fsm.o
+                0x08008ed8                LedFsm_EventHandle
  .text.LedFsm_Update
-                0x08008e10       0x8c Build/Common/Src/Led_fsm.o
-                0x08008e10                LedFsm_Update
+                0x08008f08       0x8c Build/Common/Src/Led_fsm.o
+                0x08008f08                LedFsm_Update
  .text.LedFsm_NextState
-                0x08008e9c       0x34 Build/Common/Src/Led_fsm.o
-                0x08008e9c                LedFsm_NextState
+                0x08008f94       0x34 Build/Common/Src/Led_fsm.o
+                0x08008f94                LedFsm_NextState
  .text.USART_GPIO_Init
-                0x08008ed0       0x68 Build/Common/Src/USerial.o
+                0x08008fc8       0x68 Build/Common/Src/USerial.o
  .text.Userial_Init
-                0x08008f38       0x58 Build/Common/Src/USerial.o
-                0x08008f38                Userial_Init
+                0x08009030       0x58 Build/Common/Src/USerial.o
+                0x08009030                Userial_Init
  .text.Userial_SendByte
-                0x08008f90       0x34 Build/Common/Src/USerial.o
-                0x08008f90                Userial_SendByte
+                0x08009088       0x34 Build/Common/Src/USerial.o
+                0x08009088                Userial_SendByte
  .text.Userial_SendString
-                0x08008fc4       0x4a Build/Common/Src/USerial.o
-                0x08008fc4                Userial_SendString
- *fill*         0x0800900e        0x2 
- .text.Userial_PollReceive
-                0x08009010       0x40 Build/Common/Src/USerial.o
-                0x08009010                Userial_PollReceive
+                0x080090bc       0x4a Build/Common/Src/USerial.o
+                0x080090bc                Userial_SendString
+ *fill*         0x08009106        0x2 
+ .text.USART2_IRQHandler
+                0x08009108       0x34 Build/Common/Src/USerial.o
+                0x08009108                USART2_IRQHandler
  .text.Userial_ReceiveByte
-                0x08009050       0x30 Build/Common/Src/USerial.o
-                0x08009050                Userial_ReceiveByte
+                0x0800913c       0x30 Build/Common/Src/USerial.o
+                0x0800913c                Userial_ReceiveByte
  .text.Userial_Data_Available
-                0x08009080       0x14 Build/Common/Src/USerial.o
-                0x08009080                Userial_Data_Available
+                0x0800916c       0x14 Build/Common/Src/USerial.o
+                0x0800916c                Userial_Data_Available
  *(.rodata*)
- .rodata        0x08009094       0x2d Build/App/Src/App.o
- *fill*         0x080090c1        0x3 
- .rodata.Btn    0x080090c4       0x10 Build/Common/Src/Button.o
- .rodata.Led    0x080090d4       0x10 Build/Common/Src/Led.o
-                0x080090e4                        . = ALIGN (0x4)
-                0x080090e4                        _etext = .
+ .rodata        0x08009180       0x1b Build/App/Src/App.o
+ *fill*         0x0800919b        0x1 
+ .rodata.Btn    0x0800919c       0x10 Build/Common/Src/Button.o
+ .rodata.Led    0x080091ac       0x10 Build/Common/Src/Led.o
+                0x080091bc                        . = ALIGN (0x4)
+                0x080091bc                        _etext = .
 
-.glue_7         0x080090e4        0x0
- .glue_7        0x080090e4        0x0 linker stubs
+.glue_7         0x080091bc        0x0
+ .glue_7        0x080091bc        0x0 linker stubs
 
-.glue_7t        0x080090e4        0x0
- .glue_7t       0x080090e4        0x0 linker stubs
+.glue_7t        0x080091bc        0x0
+ .glue_7t       0x080091bc        0x0 linker stubs
 
-.vfp11_veneer   0x080090e4        0x0
- .vfp11_veneer  0x080090e4        0x0 linker stubs
+.vfp11_veneer   0x080091bc        0x0
+ .vfp11_veneer  0x080091bc        0x0 linker stubs
 
-.v4_bx          0x080090e4        0x0
- .v4_bx         0x080090e4        0x0 linker stubs
+.v4_bx          0x080091bc        0x0
+ .v4_bx         0x080091bc        0x0 linker stubs
 
-.init           0x080090e4        0x4
- .init          0x080090e4        0x4 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m/nofp/crti.o
-                0x080090e4                _init
+.init           0x080091bc        0x4
+ .init          0x080091bc        0x4 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m/nofp/crti.o
+                0x080091bc                _init
 
-.fini           0x080090e8        0x4
- .fini          0x080090e8        0x4 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m/nofp/crti.o
-                0x080090e8                _fini
+.fini           0x080091c0        0x4
+ .fini          0x080091c0        0x4 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m/nofp/crti.o
+                0x080091c0                _fini
 
-.iplt           0x080090ec        0x0
- .iplt          0x080090ec        0x0 Build/App/Src/App.o
+.iplt           0x080091c4        0x0
+ .iplt          0x080091c4        0x0 Build/App/Src/App.o
 
-.rel.dyn        0x080090ec        0x0
- .rel.iplt      0x080090ec        0x0 Build/App/Src/App.o
+.rel.dyn        0x080091c4        0x0
+ .rel.iplt      0x080091c4        0x0 Build/App/Src/App.o
 
-.data           0x20000000        0x0 load address 0x080090ec
+.data           0x20000000        0x0 load address 0x080091c4
                 0x20000000                        . = ALIGN (0x4)
                 0x20000000                        _sdata = .
  *(.data*)
                 0x20000000                        . = ALIGN (0x4)
                 0x20000000                        _edata = .
 
-.igot.plt       0x20000000        0x0 load address 0x080090ec
+.igot.plt       0x20000000        0x0 load address 0x080091c4
  .igot.plt      0x20000000        0x0 Build/App/Src/App.o
 
-.bss            0x20000000       0x38 load address 0x080090ec
+.bss            0x20000000       0x38 load address 0x080091c4
                 0x20000000                        _sbss = .
  *(.bss*)
  .bss.huart2    0x20000000       0x20 Build/App/Src/App.o
@@ -917,17 +967,19 @@ LOAD linker stubs
  .ARM.attributes
                 0x000000a8       0x2e Build/Drivers/Src/Gpio.o
  .ARM.attributes
-                0x000000d6       0x2e Build/Drivers/Src/SysTick.o
+                0x000000d6       0x2e Build/Drivers/Src/Nvic.o
  .ARM.attributes
-                0x00000104       0x2e Build/Drivers/Src/Usart.o
+                0x00000104       0x2e Build/Drivers/Src/SysTick.o
  .ARM.attributes
-                0x00000132       0x2e Build/Common/Src/Button.o
+                0x00000132       0x2e Build/Drivers/Src/Usart.o
  .ARM.attributes
-                0x00000160       0x2e Build/Common/Src/Led.o
+                0x00000160       0x2e Build/Common/Src/Button.o
  .ARM.attributes
-                0x0000018e       0x2e Build/Common/Src/Led_fsm.o
+                0x0000018e       0x2e Build/Common/Src/Led.o
  .ARM.attributes
-                0x000001bc       0x2e Build/Common/Src/USerial.o
+                0x000001bc       0x2e Build/Common/Src/Led_fsm.o
+ .ARM.attributes
+                0x000001ea       0x2e Build/Common/Src/USerial.o
 
 .comment        0x00000000       0x26
  .comment       0x00000000       0x26 Build/App/Src/App.o
@@ -935,6 +987,7 @@ LOAD linker stubs
  .comment       0x00000026       0x27 Build/App/Src/Main.o
  .comment       0x00000026       0x27 Build/Linkers/Startup.o
  .comment       0x00000026       0x27 Build/Drivers/Src/Gpio.o
+ .comment       0x00000026       0x27 Build/Drivers/Src/Nvic.o
  .comment       0x00000026       0x27 Build/Drivers/Src/SysTick.o
  .comment       0x00000026       0x27 Build/Drivers/Src/Usart.o
  .comment       0x00000026       0x27 Build/Common/Src/Button.o
@@ -942,31 +995,33 @@ LOAD linker stubs
  .comment       0x00000026       0x27 Build/Common/Src/Led_fsm.o
  .comment       0x00000026       0x27 Build/Common/Src/USerial.o
 
-.debug_info     0x00000000     0x2cf1
- .debug_info    0x00000000      0x6bf Build/App/Src/App.o
- .debug_info    0x000006bf       0x50 Build/App/Src/Main.o
- .debug_info    0x0000070f      0x16a Build/Linkers/Startup.o
- .debug_info    0x00000879      0x83f Build/Drivers/Src/Gpio.o
- .debug_info    0x000010b8      0x1eb Build/Drivers/Src/SysTick.o
- .debug_info    0x000012a3      0x734 Build/Drivers/Src/Usart.o
- .debug_info    0x000019d7      0x48f Build/Common/Src/Button.o
- .debug_info    0x00001e66      0x532 Build/Common/Src/Led.o
- .debug_info    0x00002398      0x1cf Build/Common/Src/Led_fsm.o
- .debug_info    0x00002567      0x78a Build/Common/Src/USerial.o
+.debug_info     0x00000000     0x3053
+ .debug_info    0x00000000      0x6ae Build/App/Src/App.o
+ .debug_info    0x000006ae       0x50 Build/App/Src/Main.o
+ .debug_info    0x000006fe      0x16a Build/Linkers/Startup.o
+ .debug_info    0x00000868      0x83f Build/Drivers/Src/Gpio.o
+ .debug_info    0x000010a7      0x27e Build/Drivers/Src/Nvic.o
+ .debug_info    0x00001325      0x1eb Build/Drivers/Src/SysTick.o
+ .debug_info    0x00001510      0x7eb Build/Drivers/Src/Usart.o
+ .debug_info    0x00001cfb      0x48f Build/Common/Src/Button.o
+ .debug_info    0x0000218a      0x532 Build/Common/Src/Led.o
+ .debug_info    0x000026bc      0x1cf Build/Common/Src/Led_fsm.o
+ .debug_info    0x0000288b      0x7c8 Build/Common/Src/USerial.o
 
-.debug_abbrev   0x00000000      0xc4c
+.debug_abbrev   0x00000000      0xdac
  .debug_abbrev  0x00000000      0x189 Build/App/Src/App.o
  .debug_abbrev  0x00000189       0x4f Build/App/Src/Main.o
  .debug_abbrev  0x000001d8       0xf9 Build/Linkers/Startup.o
  .debug_abbrev  0x000002d1      0x1c3 Build/Drivers/Src/Gpio.o
- .debug_abbrev  0x00000494      0x123 Build/Drivers/Src/SysTick.o
- .debug_abbrev  0x000005b7      0x169 Build/Drivers/Src/Usart.o
- .debug_abbrev  0x00000720      0x13f Build/Common/Src/Button.o
- .debug_abbrev  0x0000085f      0x176 Build/Common/Src/Led.o
- .debug_abbrev  0x000009d5       0xd2 Build/Common/Src/Led_fsm.o
- .debug_abbrev  0x00000aa7      0x1a5 Build/Common/Src/USerial.o
+ .debug_abbrev  0x00000494      0x12a Build/Drivers/Src/Nvic.o
+ .debug_abbrev  0x000005be      0x123 Build/Drivers/Src/SysTick.o
+ .debug_abbrev  0x000006e1      0x186 Build/Drivers/Src/Usart.o
+ .debug_abbrev  0x00000867      0x13f Build/Common/Src/Button.o
+ .debug_abbrev  0x000009a6      0x176 Build/Common/Src/Led.o
+ .debug_abbrev  0x00000b1c       0xd2 Build/Common/Src/Led_fsm.o
+ .debug_abbrev  0x00000bee      0x1be Build/Common/Src/USerial.o
 
-.debug_aranges  0x00000000      0x330
+.debug_aranges  0x00000000      0x378
  .debug_aranges
                 0x00000000       0x50 Build/App/Src/App.o
  .debug_aranges
@@ -976,20 +1031,22 @@ LOAD linker stubs
  .debug_aranges
                 0x00000098       0xa0 Build/Drivers/Src/Gpio.o
  .debug_aranges
-                0x00000138       0x60 Build/Drivers/Src/SysTick.o
+                0x00000138       0x28 Build/Drivers/Src/Nvic.o
  .debug_aranges
-                0x00000198       0x88 Build/Drivers/Src/Usart.o
+                0x00000160       0x60 Build/Drivers/Src/SysTick.o
  .debug_aranges
-                0x00000220       0x28 Build/Common/Src/Button.o
+                0x000001c0       0xa0 Build/Drivers/Src/Usart.o
  .debug_aranges
-                0x00000248       0x50 Build/Common/Src/Led.o
+                0x00000260       0x28 Build/Common/Src/Button.o
  .debug_aranges
-                0x00000298       0x38 Build/Common/Src/Led_fsm.o
+                0x00000288       0x50 Build/Common/Src/Led.o
  .debug_aranges
-                0x000002d0       0x60 Build/Common/Src/USerial.o
+                0x000002d8       0x38 Build/Common/Src/Led_fsm.o
+ .debug_aranges
+                0x00000310       0x68 Build/Common/Src/USerial.o
 
 .debug_rnglists
-                0x00000000      0x238
+                0x00000000      0x269
  .debug_rnglists
                 0x00000000       0x37 Build/App/Src/App.o
  .debug_rnglists
@@ -999,51 +1056,56 @@ LOAD linker stubs
  .debug_rnglists
                 0x00000063       0x75 Build/Drivers/Src/Gpio.o
  .debug_rnglists
-                0x000000d8       0x43 Build/Drivers/Src/SysTick.o
+                0x000000d8       0x19 Build/Drivers/Src/Nvic.o
  .debug_rnglists
-                0x0000011b       0x64 Build/Drivers/Src/Usart.o
+                0x000000f1       0x43 Build/Drivers/Src/SysTick.o
  .debug_rnglists
-                0x0000017f       0x19 Build/Common/Src/Button.o
+                0x00000134       0x76 Build/Drivers/Src/Usart.o
  .debug_rnglists
-                0x00000198       0x37 Build/Common/Src/Led.o
+                0x000001aa       0x19 Build/Common/Src/Button.o
  .debug_rnglists
-                0x000001cf       0x26 Build/Common/Src/Led_fsm.o
+                0x000001c3       0x37 Build/Common/Src/Led.o
  .debug_rnglists
-                0x000001f5       0x43 Build/Common/Src/USerial.o
+                0x000001fa       0x26 Build/Common/Src/Led_fsm.o
+ .debug_rnglists
+                0x00000220       0x49 Build/Common/Src/USerial.o
 
-.debug_line     0x00000000     0x1448
- .debug_line    0x00000000      0x1ef Build/App/Src/App.o
- .debug_line    0x000001ef       0x5f Build/App/Src/Main.o
- .debug_line    0x0000024e       0xcb Build/Linkers/Startup.o
- .debug_line    0x00000319      0x418 Build/Drivers/Src/Gpio.o
- .debug_line    0x00000731      0x19c Build/Drivers/Src/SysTick.o
- .debug_line    0x000008cd      0x493 Build/Drivers/Src/Usart.o
- .debug_line    0x00000d60      0x10b Build/Common/Src/Button.o
- .debug_line    0x00000e6b      0x1d2 Build/Common/Src/Led.o
- .debug_line    0x0000103d      0x13c Build/Common/Src/Led_fsm.o
- .debug_line    0x00001179      0x2cf Build/Common/Src/USerial.o
+.debug_line     0x00000000     0x15c4
+ .debug_line    0x00000000      0x1ea Build/App/Src/App.o
+ .debug_line    0x000001ea       0x5f Build/App/Src/Main.o
+ .debug_line    0x00000249       0xcb Build/Linkers/Startup.o
+ .debug_line    0x00000314      0x418 Build/Drivers/Src/Gpio.o
+ .debug_line    0x0000072c       0xe0 Build/Drivers/Src/Nvic.o
+ .debug_line    0x0000080c      0x19c Build/Drivers/Src/SysTick.o
+ .debug_line    0x000009a8      0x4ff Build/Drivers/Src/Usart.o
+ .debug_line    0x00000ea7      0x10b Build/Common/Src/Button.o
+ .debug_line    0x00000fb2      0x1d2 Build/Common/Src/Led.o
+ .debug_line    0x00001184      0x13c Build/Common/Src/Led_fsm.o
+ .debug_line    0x000012c0      0x304 Build/Common/Src/USerial.o
 
-.debug_str      0x00000000      0xfd4
- .debug_str     0x00000000      0xfd4 Build/App/Src/App.o
-                                0x71b (size before relaxing)
- .debug_str     0x00000fd4       0xe9 Build/App/Src/Main.o
- .debug_str     0x00000fd4      0x1cc Build/Linkers/Startup.o
- .debug_str     0x00000fd4      0x60a Build/Drivers/Src/Gpio.o
- .debug_str     0x00000fd4      0x24e Build/Drivers/Src/SysTick.o
- .debug_str     0x00000fd4      0x677 Build/Drivers/Src/Usart.o
- .debug_str     0x00000fd4      0x4b8 Build/Common/Src/Button.o
- .debug_str     0x00000fd4      0x4e0 Build/Common/Src/Led.o
- .debug_str     0x00000fd4      0x2f3 Build/Common/Src/Led_fsm.o
- .debug_str     0x00000fd4      0x6b2 Build/Common/Src/USerial.o
+.debug_str      0x00000000     0x10fb
+ .debug_str     0x00000000     0x10fb Build/App/Src/App.o
+                                0x710 (size before relaxing)
+ .debug_str     0x000010fb       0xe9 Build/App/Src/Main.o
+ .debug_str     0x000010fb      0x1cc Build/Linkers/Startup.o
+ .debug_str     0x000010fb      0x60a Build/Drivers/Src/Gpio.o
+ .debug_str     0x000010fb      0x259 Build/Drivers/Src/Nvic.o
+ .debug_str     0x000010fb      0x24e Build/Drivers/Src/SysTick.o
+ .debug_str     0x000010fb      0x6ef Build/Drivers/Src/Usart.o
+ .debug_str     0x000010fb      0x4b8 Build/Common/Src/Button.o
+ .debug_str     0x000010fb      0x4e0 Build/Common/Src/Led.o
+ .debug_str     0x000010fb      0x2f3 Build/Common/Src/Led_fsm.o
+ .debug_str     0x000010fb      0x6eb Build/Common/Src/USerial.o
 
-.debug_frame    0x00000000      0xae4
+.debug_frame    0x00000000      0xbd8
  .debug_frame   0x00000000       0xf0 Build/App/Src/App.o
  .debug_frame   0x000000f0       0x2c Build/App/Src/Main.o
  .debug_frame   0x0000011c       0x48 Build/Linkers/Startup.o
  .debug_frame   0x00000164      0x2ac Build/Drivers/Src/Gpio.o
- .debug_frame   0x00000410      0x148 Build/Drivers/Src/SysTick.o
- .debug_frame   0x00000558      0x240 Build/Drivers/Src/Usart.o
- .debug_frame   0x00000798       0x58 Build/Common/Src/Button.o
- .debug_frame   0x000007f0      0x10c Build/Common/Src/Led.o
- .debug_frame   0x000008fc       0x98 Build/Common/Src/Led_fsm.o
- .debug_frame   0x00000994      0x150 Build/Common/Src/USerial.o
+ .debug_frame   0x00000410       0x60 Build/Drivers/Src/Nvic.o
+ .debug_frame   0x00000470      0x148 Build/Drivers/Src/SysTick.o
+ .debug_frame   0x000005b8      0x2b8 Build/Drivers/Src/Usart.o
+ .debug_frame   0x00000870       0x58 Build/Common/Src/Button.o
+ .debug_frame   0x000008c8      0x10c Build/Common/Src/Led.o
+ .debug_frame   0x000009d4       0x98 Build/Common/Src/Led_fsm.o
+ .debug_frame   0x00000a6c      0x16c Build/Common/Src/USerial.o

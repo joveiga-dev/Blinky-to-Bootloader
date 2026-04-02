@@ -31,11 +31,42 @@ void SVCall_Handler                          (void) __attribute__ ((weak, alias(
 void DebugMonitor_Handler                    (void) __attribute__ ((weak, alias("Default_Handler")));
 void PendSV_Handler                          (void) __attribute__ ((weak, alias("Default_Handler")));
 void SysTick_Handler                         (void) __attribute__ ((weak, alias("Default_Handler")));
-
-
-void Usart2_IRQ_Handler                       (void) __attribute__ ((weak, alias("Default_Handler")));          
+void EXTI16_PVD_IRQHandler                   (void) __attribute__ ((weak, alias("Default_Handler")));
+void TAMP_STAMP_IRQHandler        	(void) __attribute__ ((weak, alias("Default_Handler")));
+void EXTI22_RTC_WKUP_IRQHandler   	(void) __attribute__ ((weak, alias("Default_Handler")));
+void FLASH_IRQHandler             	(void) __attribute__ ((weak, alias("Default_Handler")));
+void RCC_IRQHandler               	(void) __attribute__ ((weak, alias("Default_Handler")));
+void EXTI0_IRQHandler             	(void) __attribute__ ((weak, alias("Default_Handler")));
+void EXTI1_IRQHandler             	(void) __attribute__ ((weak, alias("Default_Handler")));
+void EXTI2_IRQHandler             	(void) __attribute__ ((weak, alias("Default_Handler")));
+void EXTI3_IRQHandler             	(void) __attribute__ ((weak, alias("Default_Handler")));
+void EXTI4_IRQHandler             	(void) __attribute__ ((weak, alias("Default_Handler")));
+void DMA1_Stream0_IRQHandler      	(void) __attribute__ ((weak, alias("Default_Handler")));
+void DMA1_Stream1_IRQHandler      	(void) __attribute__ ((weak, alias("Default_Handler")));
+void DMA1_Stream2_IRQHandler      	(void) __attribute__ ((weak, alias("Default_Handler")));
+void DMA1_Stream3_IRQHandler      	(void) __attribute__ ((weak, alias("Default_Handler")));
+void DMA1_Stream4_IRQHandler      	(void) __attribute__ ((weak, alias("Default_Handler")));
+void DMA1_Stream5_IRQHandler      	(void) __attribute__ ((weak, alias("Default_Handler")));
+void DMA1_Stream6_IRQHandler      	(void) __attribute__ ((weak, alias("Default_Handler")));
+void ADC_IRQHandler               	(void) __attribute__ ((weak, alias("Default_Handler")));
+void EXTI9_5_IRQHandler           	(void) __attribute__ ((weak, alias("Default_Handler")));
+void TIM1_BRK_TIM9_IRQHandler     	(void) __attribute__ ((weak, alias("Default_Handler")));
+void TIM1_UP_TIM10_IRQHandler     	(void) __attribute__ ((weak, alias("Default_Handler")));
+void TIM1_TRG_COM_TIM11_IRQHandler	(void) __attribute__ ((weak, alias("Default_Handler")));
+void TIM1_CC_IRQHandler           	(void) __attribute__ ((weak, alias("Default_Handler")));
+void TIM2_IRQHandler              	(void) __attribute__ ((weak, alias("Default_Handler")));
+void TIM3_IRQHandler              	(void) __attribute__ ((weak, alias("Default_Handler")));
+void TIM4_IRQHandler              	(void) __attribute__ ((weak, alias("Default_Handler")));
+void I2C1_EV_IRQHandler           	(void) __attribute__ ((weak, alias("Default_Handler")));
+void I2C1_ER_IRQHandler           	(void) __attribute__ ((weak, alias("Default_Handler")));
+void I2C2_EV_IRQHandler           	(void) __attribute__ ((weak, alias("Default_Handler")));
+void I2C2_ER_IRQHandler           	(void) __attribute__ ((weak, alias("Default_Handler")));
+void SPI1_IRQHandler              	(void) __attribute__ ((weak, alias("Default_Handler")));
+void SPI2_IRQHandler              	(void) __attribute__ ((weak, alias("Default_Handler")));
+void USART1_IRQHandler            	(void) __attribute__ ((weak, alias("Default_Handler")));
+void USART2_IRQHandler            	(void) __attribute__ ((weak, alias("Default_Handler")));         
 /**
- * Initial interrupt vector table
+ * Initial interrupt vector table 
  */
 __attribute__((section(".vectors"), used))
 const Interrupt_Handler vectors[] = {
@@ -54,9 +85,11 @@ const Interrupt_Handler vectors[] = {
     DebugMonitor_Handler,                            /* Debug */
     0,                                               /* Reserved 13 */
     PendSV_Handler,                                  /* PendSV */
-    SysTick_Handler                                  /* SysTick */
+    SysTick_Handler,                                  /* SysTick */
 
     /* External Interrupts */
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    USART2_IRQHandler
 
 };
 

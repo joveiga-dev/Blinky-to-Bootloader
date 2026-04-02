@@ -87,10 +87,23 @@ static void Button_Task(void)
     last_btn_state = btn_state;
 }
 
-static void USart_Task(void)
+/*
+static void USart_PollingTask(void)
 {
     Userial_PollReceive(&huart2);
-    
+
+    if (Userial_Data_Available())
+    {
+        // Read the data received
+        uint8_t rx = Userial_ReceiveByte();
+        Userial_SendByte(&huart2, rx +1);
+    }
+}
+*/
+
+static void USart_InterruptTask(void)
+{
+
     if (Userial_Data_Available())
     {
         // Read the data received
@@ -105,5 +118,5 @@ void App_Task(void)
 {
     Led_Task();
     Button_Task();
-    USart_Task();
+    USart_InterruptTask();
 }

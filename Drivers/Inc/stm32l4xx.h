@@ -151,6 +151,7 @@ typedef struct {
 #define UART4              ((USART_RegDef_t *) UART4_BASE)
 #define UART5              ((USART_RegDef_t *) UART5_BASE)
 
+
 /* USART Enable */
 #define USART_CR1_UE            BIT(0U)
 /* Tx Enable */
@@ -169,6 +170,11 @@ typedef struct {
 #define USART_CR1_M1_Msk         (0x1UL << USART_CR1_M1_Pos)
 #define USART_CR1_M1             USART_CR1_M1_Msk
 #define USART_CR1_OVER8          BIT(15U)
+
+/* RX Enable Interrupt */
+#define USART_CR1_RXNEIE        BIT(5U)
+#define USART_CR1_TXEIE         BIT(7U)
+
 /* USART baud rate register */
 //#define USART_BRR_USART15_4
 
@@ -235,6 +241,31 @@ typedef struct {
 #define SCB_BASE                  (0xE000ED00UL)
 /* VTOR:  Vector Table Offset Register */
 #define SCB_VTOR                  MMIO32(SCB_BASE + 0x08U)
+
+
+/* NVIC */
+#define NVIC_ADDR_OFFSET(X)      ((0X100) + (0X04) * (x))
+
+/* Memory map of Nvic hardware registers*/
+typedef struct {
+    volatile uint32_t NVIC_ISER[8];         /* [R/W] Offset: 0x000   Interrupt Set-Enable Register*/
+    volatile const uint32_t RESERVED1[24];           /* [R]   Reserved */   
+    volatile uint32_t NVIC_ICER[8];         /* [R/W] Offset: 0x080   Interrupt Enable-Clear and Register*/
+    volatile const uint32_t RESERVED2[24];           /* [R]   Reserved */   
+    volatile uint32_t NVIC_ISPR[8];         /* [R/W] Offset: 0x100   Interrupt Set-Pending Register*/
+    volatile const uint32_t RESERVED3[24];           /* [R]   Reserved */   
+    volatile uint32_t NVIC_ICPR[8];         /* [R/W] Offset: 0x180   Interrupt Clear-Pending Register*/
+    volatile const uint32_t RESERVED4[24];           /* [R]   Reserved */
+    volatile uint32_t NVIC_IABR[8];         /* [R/W] Offset: 0x200   Interrupt Active Bit Register*/
+    volatile const uint32_t RESERVED5[56];           /* [R]   Reserved */
+    volatile uint32_t NVIC_IPR[60];         /* [R/W] Offset: 0x300   Interrupt Priority Register*/
+    volatile const uint32_t RESERVED6[644];           /* [R]   Reserved */ 
+    uint32_t NVIC_STIR;                      /* [R/W] Offset: 0xE00  Software Triggered Interrupt Register*/
+} Nvic_RegDef_t;
+
+#define NVIC_BASE                 (0xE000E100UL)
+#define NVIC                     ((Nvic_RegDef_t *) NVIC_BASE)
+
 
 
 

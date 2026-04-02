@@ -35,7 +35,7 @@ void Delay_Ms(uint32_t ms);
 void Delay_Us(uint32_t us);
 
 uint8_t SysTick_Elapsed(uint32_t start, uint32_t delay);
-void SysTick_Handler(void);
+//void SysTick_Handler(void);
 void SysTick_EnableWDT(void);
 
 #endif

@@ -2,6 +2,7 @@
 #include "Gpio.h"
 #include "Usart.h"
 
+
 static uint8_t data_buffer = 0;
 static bool data_available = false;
 
@@ -124,6 +125,19 @@ void Userial_SendString(USART_Handle *Husart, const char *data)
 }
 
 /**
+ * 
+ */
+
+ void USART2_IRQHandler(void)
+ {
+    if(USART_RxIsReady(USART2))
+    {
+        data_buffer = (uint8_t)USART_ReceiveFrame(USART2);
+        data_available = true;
+    }
+ }
+
+/**
  * Blocking
  */
 void Userial_PollReceive(USART_Handle *Husart)
@@ -133,7 +147,7 @@ void Userial_PollReceive(USART_Handle *Husart)
         return;
     }
 
-    data_buffer = (uint8_t)USART_ReceiveFrame(Husart->Usartx.Port);
+    data_buffer = (uint8_t)USART_ReceivePollFrame(Husart->Usartx.Port);
     data_available = true;
 }
 
