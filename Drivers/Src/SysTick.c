@@ -72,8 +72,8 @@ uint32_t SysTick_GetTimeSec(void)
  */
 void Delay_Ms(uint32_t ms)
 {
-    uint32_t start = systick_ms;
-    while ((systick_ms - start) < ms)
+    uint32_t start = SysTick_GetTick();
+    while ((SysTick_GetTick() - start) < ms)
     {
         __asm volatile ("wfi");
         // Spin
