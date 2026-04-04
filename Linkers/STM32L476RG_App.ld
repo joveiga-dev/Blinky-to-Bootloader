@@ -64,6 +64,7 @@ SECTIONS
     } > SRAM
 
     _end = .; 
+
    
    /* Create a symbol for the end of ram */
     _esram = ORIGIN(SRAM) + LENGTH(SRAM);          

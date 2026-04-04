@@ -1,4 +1,4 @@
-#include "Ring_Buffer.h"
+#include "RingBuffer.h"
 
 /**
  * @details Initializes the Ring buffer.
@@ -8,16 +8,11 @@
  */
 void RingBuffer_Init(RingBuffer_t *Rb, uint8_t *buffer, uint32_t size)
 {
-    if (RINGBUFFER_POWER_OF_TWO(size) != 0)
-    {
-        return;
-    }
 
     Rb->buffer = buffer;
     Rb->read_index = 0;
     Rb->write_index = 0;
     Rb->mask = size - 1;
-    Rb->status = BUFFER_EMPTY;
 }
 
 /**
@@ -34,50 +29,35 @@ bool RingBuffer_Empty(RingBuffer_t *Rb)
 /**
  * @details Determines whether or not the Queue is Full
  * @param Rb The ring buffer
- * @returns true if full; false otherwise
+ * @returns BUFFER_FULL if full; BUFFER_NOT_FULL otherwise
  */
 bool RingBuffer_Full(RingBuffer_t *Rb)
 {
-    return (((Rb->write_index +1) & Rb->mask) == (Rb->read_index)) ;
+    uint32_t next_write_index = ((Rb->write_index + 1) & Rb->mask );
+
+    return (next_write_index == Rb->read_index);
 }
 
 /**
  * @details Get a byte from the Queue, (TAIL)
  */
-bool RingBuffer_Read(RingBuffer_t *Rb, uint8_t *byte)
+RingBuffer_Status RingBuffer_Read(RingBuffer_t *Rb, uint8_t *byte)
 {
-    uint32_t next_read_index;
+    uint32_t local_read_index = Rb->read_index;
+    uint32_t local_write_index = Rb->write_index;
 
-    if (Rb->write_index == Rb->read_index)               // We don't have any data to read -> Ring buffer empty
+    if (local_write_index == local_read_index)               // We don't have any data to read -> Ring buffer empty
     {
-        return false;
+        return BUFFER_EMPTY;
     }
 
-    next_read_index = ((Rb->read_index + 1) & Rb->mask);
+    *byte = Rb->buffer[local_read_index];
+    local_read_index = (local_read_index + 1) & Rb->mask;
+    Rb->read_index = local_read_index;
 
-    *byte = Rb->buffer[Rb->read_index];
-    Rb->read_index = next_read_index;
-    return true;
+    return BUFFER_OK;
 }
 
-bool RingBuffer_ReadArr(RingBuffer_t *Rb, const uint8_t *byte, uint32_t size)
-{
-    if(Rb->write_index == Rb->read_index)
-    {
-        return false;
-    }
-
-    uint32_t count = 0;
-
-
-    for (count = 0; count < size; count++)
-    {
-        RingBuffer_Read(Rb, &byte[count]);
-    }
-    
-    return true;
-    
-}
 
 
 /**
@@ -85,36 +65,36 @@ bool RingBuffer_ReadArr(RingBuffer_t *Rb, const uint8_t *byte, uint32_t size)
  * @param Rb The buffer in which the data shjould be put
  * @param byte The byte to put in the ring buffer
  */
-bool RingBuffer_Write(RingBuffer_t *Rb, uint8_t byte)
+RingBuffer_Status RingBuffer_Write(RingBuffer_t *Rb, uint8_t byte)
 {
-    uint32_t local_write_index = Rb->write_index;
+    
     uint32_t local_read_index = Rb->read_index;
-
-    uint32_t next_write_index = (Rb->write_index + 1) & Rb->mask;   // next where head will point to after this write
-
-    if (next_write_index == local_read_index)                         // If head +1 == tail, buffer is full
+    uint32_t local_write_index = Rb->write_index;
+    uint32_t next_write_index = (Rb->write_index + 1) & Rb->mask;
+    
+    if(next_write_index == local_read_index)
     {
-        return false;
-        // Raise an exception or
-        // Overwrite the oldest byte
+        return BUFFER_FULL;
     }
 
-    Rb->buffer[Rb->write_index] = byte;                              // Load data
+    Rb->buffer[local_write_index] = byte;                           
     Rb->write_index = next_write_index;
-    return true;
+    return BUFFER_OK;
+}
+
+
+/**
+ * @details Number of bytes available for reading
+ */
+uint32_t RingBuffer_Available(RingBuffer_t *Rb)
+{
+    return (Rb->write_index - Rb->read_index) & Rb->mask;
 }
 
 /**
- * @details Put na array of bytes into buffer
- * @param Rb The buffer
- * @param byte A pointer to the array 
- * @param size The size of the array
+ * @details Free space available for writing
  */
-bool RingBuffer_WriteArr(RingBuffer_t *Rb, const uint8_t *byte, uint32_t size)
+uint32_t RingBuffer_FreeSpace(RingBuffer_t *Rb)
 {
-    for (uint32_t i = 0; i < size; i++)
-    {
-        RingBuffer_Write(Rb, byte[i]);
-    }
-    
+    return ((Rb->write_index - Rb->read_index) - 1) & Rb->mask;
 }

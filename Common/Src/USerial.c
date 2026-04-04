@@ -1,10 +1,16 @@
 #include "USerial.h"
 #include "Gpio.h"
 #include "Usart.h"
+#include "RingBuffer.h"
 
+#define RING_BUFFER_SIZE                           (128)         // Must be power of 2
+static RingBuffer_t Rb = {0U};
+static uint8_t usart_rx_buffer[RING_BUFFER_SIZE] = {0U};
 
-static uint8_t data_buffer = 0;
-static bool data_available = false;
+volatile uint32_t rx_irq_count = 0;
+volatile uint32_t rx_overflow_count = 0;
+volatile uint8_t rx_last_byte = 0;
+
 
 static void USART_GPIO_Init (USART_Handle *Husart)
 {
@@ -35,6 +41,8 @@ static void USART_GPIO_Init (USART_Handle *Husart)
 void Userial_Init(USART_Handle *Husart)
 {
     if(!Husart) return;
+
+    RingBuffer_Init(&Rb, usart_rx_buffer, RING_BUFFER_SIZE);
 
     USART_GPIO_Init(Husart);
 
@@ -125,65 +133,103 @@ void Userial_SendString(USART_Handle *Husart, const char *data)
 }
 
 /**
- * 
+ * @details Interrupt Service Routine
  */
 
  void USART2_IRQHandler(void)
  {
+    
     if(USART_RxIsReady(USART2))
-    {
-        data_buffer = (uint8_t)USART_ReceiveFrame(USART2);
-        data_available = true;
+    {   
+        rx_irq_count++;
+
+        uint8_t frame = (uint8_t)USART_ReceiveFrame(USART2);
+        rx_last_byte = frame;
+
+        RingBuffer_Status status = RingBuffer_Write(&Rb, frame);
+        
+        if (status == BUFFER_FULL)
+        {
+            rx_overflow_count++;
+        }
     }
  }
 
-/**
- * Blocking
- */
-void Userial_PollReceive(USART_Handle *Husart)
-{
-    if (Husart == NULL || Husart->Usartx.Port == NULL)
-    {
-        return;
-    }
-
-    data_buffer = (uint8_t)USART_ReceivePollFrame(Husart->Usartx.Port);
-    data_available = true;
-}
-
-
+ /**
+  * 
+  */
 uint32_t Userial_ReceiveData(uint8_t *data, uint32_t len)
 {
-    if ((len = 0U) || (data == NULL))
+    if ((len == 0U) || (data == NULL))
     {
         return 0;
     }
 
-    if(!data_available)
+    uint32_t bytes_read = 0;
+
+    for (bytes_read = 0; bytes_read < len; bytes_read++) 
     {
-        return 0;
+        if (RingBuffer_Read(&Rb, &data[bytes_read]) != BUFFER_OK) 
+        {
+            break;
+        }
     }
 
-    *data = data_buffer;
-    data_available = false;
-    return 1;
+    return bytes_read;
 }
 
+/**
+ * 
+ */
 uint8_t Userial_ReceiveByte(void)
 {
-    if(!data_available)
+    uint8_t byte = 0;
+    if(RingBuffer_Read(&Rb, &byte) != BUFFER_OK)
     {
         return 0;
     }
-
-    data_available = false;
-    return data_buffer;
+    return byte;
 }
 
-
+/**
+ * 
+ */
 bool Userial_Data_Available(void)
 {
-    return data_available;
+    return (!RingBuffer_Empty(&Rb));
+}
+
+/**
+ * 
+ */
+void Userial_Debug(USART_Handle *huart, const char *fmt, ...)
+{
+    char buf[128];
+
+    va_list args;
+    va_start(args, fmt);
+    vsnprintf(buf, sizeof(buf), fmt, args);
+    va_end(args);
+
+    Userial_SendString(huart, buf);
+}
+
+/**
+ * 
+ */
+void Userial_DebugTask(USART_Handle *huart)
+{
+    uint8_t byte;
+
+    if (RingBuffer_Read(&Rb, &byte) == BUFFER_OK)
+    {
+        Userial_Debug(huart,
+                   "RX byte: 0x%02X | IRQ=%lu | OVF=%lu\r\n",
+                   byte,
+                   rx_irq_count,
+                   rx_overflow_count);
+                   Userial_Debug(huart, "RX byte: 0x%02X\r\n", byte);
+    }
 }
 
 

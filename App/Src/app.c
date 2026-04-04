@@ -103,7 +103,6 @@ static void USart_PollingTask(void)
 
 static void USart_InterruptTask(void)
 {
-
     if (Userial_Data_Available())
     {
         // Read the data received

@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdio.h>
+#include <stdarg.h>
 
 #include "Stm32l4xx.h"
 #include "Usart.h"
@@ -38,6 +40,7 @@ uint32_t Userial_ReceiveData(uint8_t *data, uint32_t len);
 uint8_t Userial_ReceiveByte(void);
 void Userial_PollReceive(USART_Handle *Husart);
 bool Userial_Data_Available(void);
-
+void Userial_Debug(USART_Handle *huart, const char *fmt, ...);
+void Userial_DebugTask(USART_Handle *huart);
 
 #endif
