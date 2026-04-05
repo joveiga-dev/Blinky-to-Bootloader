@@ -4,5 +4,8 @@
 *.bin
 *.hex
 *.map
-*.lst
+
+*__pycache__**
+*.vscode/*
+*.vscode*
 

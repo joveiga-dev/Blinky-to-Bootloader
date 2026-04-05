@@ -8,10 +8,9 @@
 #include "Led_fsm.h"
 #include "USerial.h"
 
-#define BOOTLOADER_SIZE    (0x8000U)
+#define BOOTLOADER_SIZE (0x8000U)
 
-
-static USART_Handle huart2;
+USART_Handle huart2;
 
 static void Vector_Setup(void)
 {
@@ -19,7 +18,7 @@ static void Vector_Setup(void)
 }
 
 /**
- * 
+ *
  */
 void Usart2_Init(void)
 {
@@ -42,11 +41,11 @@ void Usart2_Init(void)
 
     Userial_Init(&huart2);
 
-    Userial_SendString(&huart2,  "USART Ready\r\n");
+    Userial_SendString(&huart2, "USART Ready\r\n");
 }
 
 /**
- * 
+ *
  */
 void App_Init(void)
 {
@@ -57,16 +56,14 @@ void App_Init(void)
     LedFsm_Init();
     Usart2_Init();
 
-    Userial_SendString(&huart2,  "App INIT\r\n");
+    Userial_SendString(&huart2, "App INIT\r\n");
 }
-
 
 static void Led_Task(void)
 {
-    uint32_t current_time = SysTick_GetTimeMs(); 
+    uint32_t current_time = SysTick_GetTimeMs();
     LedFsm_Update(current_time);
 }
-
 
 static void Button_Task(void)
 {
@@ -107,12 +104,9 @@ static void USart_InterruptTask(void)
     {
         // Read the data received
         uint8_t rx = Userial_ReceiveByte();
-        Userial_SendByte(&huart2, rx +1);
+        Userial_SendByte(&huart2, rx + 1);
     }
-
 }
-
-
 
 void App_Task(void)
 {
