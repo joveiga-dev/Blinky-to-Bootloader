@@ -1,5 +1,4 @@
 # Build and artifacts
-Build/
 *.o
 *.elf
 *.bin
