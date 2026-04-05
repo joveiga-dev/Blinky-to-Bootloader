@@ -3,5 +3,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdio.h>
+#include <stdarg.h>
 
 #endif // COMMON_DEFINES_H

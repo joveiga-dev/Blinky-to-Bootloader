@@ -9,8 +9,7 @@
 #ifndef LED_FSM_H_
 #define LED_FSM_H_
 
-#include <stdio.h>
-#include <stdint.h>
+#include "Common_Defines.h"
 
 
 #define USER_LED_SLOW_BLINK   500

@@ -3,7 +3,7 @@
 
 #include "Gpio.h"
 
-#include <stdbool.h>
+#include "Common_Defines.h"
 
 /* STM32 User Button Definition */
 #define USER_BUTTON1_BANK        GPIOC

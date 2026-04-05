@@ -514,6 +514,8 @@ Discarded input sections
  .text          0x00000000        0x0 Build/Common/Src/USerial.o
  .data          0x00000000        0x0 Build/Common/Src/USerial.o
  .bss           0x00000000        0x0 Build/Common/Src/USerial.o
+ .bss.rx_overflow_count
+                0x00000000        0x4 Build/Common/Src/USerial.o
  .text.Userial_SendData
                 0x00000000       0x5a Build/Common/Src/USerial.o
  .text.Userial_ReceiveData
@@ -742,7 +744,7 @@ END GROUP
 LOAD /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m/nofp/crtend.o
 LOAD /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m/nofp/crtn.o
 
-.text           0x08000000     0x930c
+.text           0x08000000     0x9304
                 0x08000000                        . = ALIGN (0x4)
  *(.bootloader_section)
  .bootloader_section
@@ -951,84 +953,83 @@ LOAD /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m/nofp/crtn.o
                 0x08008f94       0x34 Build/Common/Src/Led_fsm.o
                 0x08008f94                LedFsm_NextState
  .text.RingBuffer_Init
-                0x08008fc8       0x30 Build/Common/Src/RingBuffer.o
+                0x08008fc8       0x38 Build/Common/Src/RingBuffer.o
                 0x08008fc8                RingBuffer_Init
  .text.RingBuffer_Empty
-                0x08008ff8       0x24 Build/Common/Src/RingBuffer.o
-                0x08008ff8                RingBuffer_Empty
+                0x08009000       0x24 Build/Common/Src/RingBuffer.o
+                0x08009000                RingBuffer_Empty
  .text.RingBuffer_Read
-                0x0800901c       0x4e Build/Common/Src/RingBuffer.o
-                0x0800901c                RingBuffer_Read
+                0x08009024       0x54 Build/Common/Src/RingBuffer.o
+                0x08009024                RingBuffer_Read
  .text.RingBuffer_Write
-                0x0800906a       0x50 Build/Common/Src/RingBuffer.o
-                0x0800906a                RingBuffer_Write
+                0x08009078       0x50 Build/Common/Src/RingBuffer.o
+                0x08009078                RingBuffer_Write
  .text.USART_GPIO_Init
-                0x080090ba       0x68 Build/Common/Src/USerial.o
- *fill*         0x08009122        0x2 
+                0x080090c8       0x68 Build/Common/Src/USerial.o
  .text.Userial_Init
-                0x08009124       0x6c Build/Common/Src/USerial.o
-                0x08009124                Userial_Init
+                0x08009130       0x6c Build/Common/Src/USerial.o
+                0x08009130                Userial_Init
  .text.Userial_SendByte
-                0x08009190       0x34 Build/Common/Src/USerial.o
-                0x08009190                Userial_SendByte
+                0x0800919c       0x34 Build/Common/Src/USerial.o
+                0x0800919c                Userial_SendByte
  .text.Userial_SendString
-                0x080091c4       0x4a Build/Common/Src/USerial.o
-                0x080091c4                Userial_SendString
- *fill*         0x0800920e        0x2 
+                0x080091d0       0x4a Build/Common/Src/USerial.o
+                0x080091d0                Userial_SendString
+ *fill*         0x0800921a        0x2 
  .text.USART2_IRQHandler
-                0x08009210       0x68 Build/Common/Src/USerial.o
-                0x08009210                USART2_IRQHandler
+                0x0800921c       0x54 Build/Common/Src/USerial.o
+                0x0800921c                USART2_IRQHandler
  .text.Userial_ReceiveByte
-                0x08009278       0x2c Build/Common/Src/USerial.o
-                0x08009278                Userial_ReceiveByte
+                0x08009270       0x2c Build/Common/Src/USerial.o
+                0x08009270                Userial_ReceiveByte
  .text.Userial_Data_Available
-                0x080092a4       0x2c Build/Common/Src/USerial.o
-                0x080092a4                Userial_Data_Available
+                0x0800929c       0x2c Build/Common/Src/USerial.o
+                0x0800929c                Userial_Data_Available
  *(.rodata*)
- .rodata        0x080092d0       0x1b Build/App/Src/App.o
- *fill*         0x080092eb        0x1 
- .rodata.Btn    0x080092ec       0x10 Build/Common/Src/Button.o
- .rodata.Led    0x080092fc       0x10 Build/Common/Src/Led.o
-                0x0800930c                        . = ALIGN (0x4)
-                0x0800930c                        _etext = .
+ .rodata        0x080092c8       0x1b Build/App/Src/App.o
+ *fill*         0x080092e3        0x1 
+ .rodata.Btn    0x080092e4       0x10 Build/Common/Src/Button.o
+ .rodata.Led    0x080092f4       0x10 Build/Common/Src/Led.o
+                0x08009304                        . = ALIGN (0x4)
+                0x08009304                        _etext = .
 
-.glue_7         0x0800930c        0x0
- .glue_7        0x0800930c        0x0 linker stubs
+.glue_7         0x08009304        0x0
+ .glue_7        0x08009304        0x0 linker stubs
 
-.glue_7t        0x0800930c        0x0
- .glue_7t       0x0800930c        0x0 linker stubs
+.glue_7t        0x08009304        0x0
+ .glue_7t       0x08009304        0x0 linker stubs
 
-.vfp11_veneer   0x0800930c        0x0
- .vfp11_veneer  0x0800930c        0x0 linker stubs
+.vfp11_veneer   0x08009304        0x0
+ .vfp11_veneer  0x08009304        0x0 linker stubs
 
-.v4_bx          0x0800930c        0x0
- .v4_bx         0x0800930c        0x0 linker stubs
+.v4_bx          0x08009304        0x0
+ .v4_bx         0x08009304        0x0 linker stubs
 
-.init           0x0800930c        0x4
- .init          0x0800930c        0x4 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m/nofp/crti.o
-                0x0800930c                _init
+.init           0x08009304        0x4
+ .init          0x08009304        0x4 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m/nofp/crti.o
+                0x08009304                _init
 
-.fini           0x08009310        0x4
- .fini          0x08009310        0x4 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m/nofp/crti.o
-                0x08009310                _fini
+.fini           0x08009308        0x4
+ .fini          0x08009308        0x4 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m/nofp/crti.o
+                0x08009308                _fini
 
-.iplt           0x08009314        0x0
- .iplt          0x08009314        0x0 Build/App/Src/App.o
+.iplt           0x0800930c        0x0
+ .iplt          0x0800930c        0x0 Build/App/Src/App.o
 
-.rel.dyn        0x08009314        0x0
- .rel.iplt      0x08009314        0x0 Build/App/Src/App.o
+.rel.dyn        0x0800930c        0x0
+ .rel.iplt      0x0800930c        0x0 Build/App/Src/App.o
 
-.data           0x20000000        0x0 load address 0x08009314
+.data           0x20000000        0x0 load address 0x0800930c
                 0x20000000                        . = ALIGN (0x4)
                 0x20000000                        _sdata = .
  *(.data*)
                 0x20000000                        . = ALIGN (0x4)
                 0x20000000                        _edata = .
 
-.igot.plt       0x20000000        0x0 load address 0x08009314
+.igot.plt       0x20000000        0x0 load address 0x0800930c
  .igot.plt      0x20000000        0x0 Build/App/Src/App.o
 
-.bss            0x20000000       0xd0 load address 0x08009314
+.bss            0x20000000       0xcc load address 0x0800930c
                 0x20000000                        _sbss = .
  *(.bss*)
  .bss.huart2    0x20000000       0x20 Build/App/Src/App.o
@@ -1050,17 +1051,14 @@ LOAD /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m/nofp/crtn.o
  .bss.rx_irq_count
                 0x200000c4        0x4 Build/Common/Src/USerial.o
                 0x200000c4                rx_irq_count
- .bss.rx_overflow_count
-                0x200000c8        0x4 Build/Common/Src/USerial.o
-                0x200000c8                rx_overflow_count
  .bss.rx_last_byte
-                0x200000cc        0x1 Build/Common/Src/USerial.o
-                0x200000cc                rx_last_byte
+                0x200000c8        0x1 Build/Common/Src/USerial.o
+                0x200000c8                rx_last_byte
  *(COMMON)
-                0x200000d0                        . = ALIGN (0x4)
- *fill*         0x200000cd        0x3 
-                0x200000d0                        _ebss = .
-                0x200000d0                        _end = .
+                0x200000cc                        . = ALIGN (0x4)
+ *fill*         0x200000c9        0x3 
+                0x200000cc                        _ebss = .
+                0x200000cc                        _end = .
                 0x20018000                        _esram = (ORIGIN (SRAM) + LENGTH (SRAM))
 OUTPUT(Build/firmware.elf elf32-littlearm)
 LOAD linker stubs
@@ -1109,7 +1107,7 @@ LOAD linker stubs
  .comment       0x00000026       0x27 Build/Common/Src/RingBuffer.o
  .comment       0x00000026       0x27 Build/Common/Src/USerial.o
 
-.debug_info     0x00000000     0x3541
+.debug_info     0x00000000     0x3569
  .debug_info    0x00000000      0x6ae Build/App/Src/App.o
  .debug_info    0x000006ae       0x50 Build/App/Src/Main.o
  .debug_info    0x000006fe      0x16a Build/Linkers/Startup.o
@@ -1117,13 +1115,13 @@ LOAD linker stubs
  .debug_info    0x000010a7      0x27e Build/Drivers/Src/Nvic.o
  .debug_info    0x00001325      0x1eb Build/Drivers/Src/SysTick.o
  .debug_info    0x00001510      0x7eb Build/Drivers/Src/Usart.o
- .debug_info    0x00001cfb      0x48f Build/Common/Src/Button.o
- .debug_info    0x0000218a      0x532 Build/Common/Src/Led.o
- .debug_info    0x000026bc      0x1cf Build/Common/Src/Led_fsm.o
- .debug_info    0x0000288b      0x2a1 Build/Common/Src/RingBuffer.o
- .debug_info    0x00002b2c      0xa15 Build/Common/Src/USerial.o
+ .debug_info    0x00001cfb      0x49d Build/Common/Src/Button.o
+ .debug_info    0x00002198      0x532 Build/Common/Src/Led.o
+ .debug_info    0x000026ca      0x1cf Build/Common/Src/Led_fsm.o
+ .debug_info    0x00002899      0x2b1 Build/Common/Src/RingBuffer.o
+ .debug_info    0x00002b4a      0xa1f Build/Common/Src/USerial.o
 
-.debug_abbrev   0x00000000      0xf05
+.debug_abbrev   0x00000000      0xeed
  .debug_abbrev  0x00000000      0x189 Build/App/Src/App.o
  .debug_abbrev  0x00000189       0x4f Build/App/Src/Main.o
  .debug_abbrev  0x000001d8       0xf9 Build/Linkers/Startup.o
@@ -1134,8 +1132,8 @@ LOAD linker stubs
  .debug_abbrev  0x00000867      0x13f Build/Common/Src/Button.o
  .debug_abbrev  0x000009a6      0x176 Build/Common/Src/Led.o
  .debug_abbrev  0x00000b1c       0xd2 Build/Common/Src/Led_fsm.o
- .debug_abbrev  0x00000bee       0xf2 Build/Common/Src/RingBuffer.o
- .debug_abbrev  0x00000ce0      0x225 Build/Common/Src/USerial.o
+ .debug_abbrev  0x00000bee       0xf0 Build/Common/Src/RingBuffer.o
+ .debug_abbrev  0x00000cde      0x20f Build/Common/Src/USerial.o
 
 .debug_aranges  0x00000000      0x3d0
  .debug_aranges
@@ -1190,7 +1188,7 @@ LOAD linker stubs
  .debug_rnglists
                 0x00000257       0x4f Build/Common/Src/USerial.o
 
-.debug_line     0x00000000     0x1804
+.debug_line     0x00000000     0x1805
  .debug_line    0x00000000      0x1ea Build/App/Src/App.o
  .debug_line    0x000001ea       0x5f Build/App/Src/Main.o
  .debug_line    0x00000249       0xcb Build/Linkers/Startup.o
@@ -1201,23 +1199,23 @@ LOAD linker stubs
  .debug_line    0x00000eb2      0x10b Build/Common/Src/Button.o
  .debug_line    0x00000fbd      0x1d2 Build/Common/Src/Led.o
  .debug_line    0x0000118f      0x13c Build/Common/Src/Led_fsm.o
- .debug_line    0x000012cb      0x1ae Build/Common/Src/RingBuffer.o
- .debug_line    0x00001479      0x38b Build/Common/Src/USerial.o
+ .debug_line    0x000012cb      0x1b7 Build/Common/Src/RingBuffer.o
+ .debug_line    0x00001482      0x383 Build/Common/Src/USerial.o
 
-.debug_str      0x00000000     0x128c
- .debug_str     0x00000000     0x128c Build/App/Src/App.o
+.debug_str      0x00000000     0x12ad
+ .debug_str     0x00000000     0x12ad Build/App/Src/App.o
                                 0x710 (size before relaxing)
- .debug_str     0x0000128c       0xe9 Build/App/Src/Main.o
- .debug_str     0x0000128c      0x1cc Build/Linkers/Startup.o
- .debug_str     0x0000128c      0x60a Build/Drivers/Src/Gpio.o
- .debug_str     0x0000128c      0x259 Build/Drivers/Src/Nvic.o
- .debug_str     0x0000128c      0x24e Build/Drivers/Src/SysTick.o
- .debug_str     0x0000128c      0x6ef Build/Drivers/Src/Usart.o
- .debug_str     0x0000128c      0x4b8 Build/Common/Src/Button.o
- .debug_str     0x0000128c      0x4e0 Build/Common/Src/Led.o
- .debug_str     0x0000128c      0x2f3 Build/Common/Src/Led_fsm.o
- .debug_str     0x0000128c      0x295 Build/Common/Src/RingBuffer.o
- .debug_str     0x0000128c      0x807 Build/Common/Src/USerial.o
+ .debug_str     0x000012ad       0xe9 Build/App/Src/Main.o
+ .debug_str     0x000012ad      0x1cc Build/Linkers/Startup.o
+ .debug_str     0x000012ad      0x60a Build/Drivers/Src/Gpio.o
+ .debug_str     0x000012ad      0x259 Build/Drivers/Src/Nvic.o
+ .debug_str     0x000012ad      0x24e Build/Drivers/Src/SysTick.o
+ .debug_str     0x000012ad      0x6ef Build/Drivers/Src/Usart.o
+ .debug_str     0x000012ad      0x4c9 Build/Common/Src/Button.o
+ .debug_str     0x000012ad      0x4e0 Build/Common/Src/Led.o
+ .debug_str     0x000012ad      0x2f3 Build/Common/Src/Led_fsm.o
+ .debug_str     0x000012ad      0x2c7 Build/Common/Src/RingBuffer.o
+ .debug_str     0x000012ad      0x828 Build/Common/Src/USerial.o
 
 .debug_frame    0x00000000      0xd38
  .debug_frame   0x00000000       0xf0 Build/App/Src/App.o

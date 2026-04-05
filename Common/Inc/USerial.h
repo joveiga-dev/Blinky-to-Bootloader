@@ -1,10 +1,7 @@
 #ifndef USERIAL_H_
 #define USERIAL_H_
 
-#include <stdint.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdarg.h>
+#include "Common_Defines.h"
 
 #include "Stm32l4xx.h"
 #include "Usart.h"

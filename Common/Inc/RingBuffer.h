@@ -5,12 +5,13 @@
 
 #define RINGBUFFER_POWER_OF_TWO(x) ((x) && !(((x) & ((x) - 1)) == 0))
 
-typedef enum RingBuffer_Status
+typedef enum
 {
-    BUFFER_OK = 0,
-    BUFFER_EMPTY,
-    BUFFER_FULL,
-} RingBuffer_Status;
+    RINGBUFFER_OK = 0,
+    RINGBUFFER_EMPTY,
+    RINGBUFFER_FULL,
+    RINGBUFFER_INVALID
+} RingBuffer_Status_t;
 
 /**
  * Structure which holds a ring buffer
@@ -28,8 +29,8 @@ void RingBuffer_Init(RingBuffer_t *Rb, uint8_t *buffer, uint32_t size);
 bool RingBuffer_Empty(RingBuffer_t *Rb);
 bool RingBuffer_Full(RingBuffer_t *Rb);
 
-RingBuffer_Status RingBuffer_Write(RingBuffer_t *Rb, uint8_t byte);
-RingBuffer_Status RingBuffer_Read(RingBuffer_t *Rb, uint8_t *byte);
+RingBuffer_Status_t RingBuffer_Write(RingBuffer_t *Rb, uint8_t byte);
+RingBuffer_Status_t RingBuffer_Read(RingBuffer_t *Rb, uint8_t *byte);
 
 uint32_t RingBuffer_Available(RingBuffer_t *Rb);
 uint32_t RingBuffer_FreeSpace(RingBuffer_t *Rb);

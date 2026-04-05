@@ -146,11 +146,11 @@ void Userial_SendString(USART_Handle *Husart, const char *data)
         uint8_t frame = (uint8_t)USART_ReceiveFrame(USART2);
         rx_last_byte = frame;
 
-        RingBuffer_Status status = RingBuffer_Write(&Rb, frame);
+        RingBuffer_Status_t status = RingBuffer_Write(&Rb, frame);
         
-        if (status == BUFFER_FULL)
+        if (status == RINGBUFFER_FULL)
         {
-            rx_overflow_count++;
+            //rx_overflow_count++;
         }
     }
  }
@@ -169,7 +169,7 @@ uint32_t Userial_ReceiveData(uint8_t *data, uint32_t len)
 
     for (bytes_read = 0; bytes_read < len; bytes_read++) 
     {
-        if (RingBuffer_Read(&Rb, &data[bytes_read]) != BUFFER_OK) 
+        if (RingBuffer_Read(&Rb, &data[bytes_read]) != RINGBUFFER_OK) 
         {
             break;
         }
@@ -184,7 +184,7 @@ uint32_t Userial_ReceiveData(uint8_t *data, uint32_t len)
 uint8_t Userial_ReceiveByte(void)
 {
     uint8_t byte = 0;
-    if(RingBuffer_Read(&Rb, &byte) != BUFFER_OK)
+    if(RingBuffer_Read(&Rb, &byte) != RINGBUFFER_OK)
     {
         return 0;
     }
@@ -221,7 +221,7 @@ void Userial_DebugTask(USART_Handle *huart)
 {
     uint8_t byte;
 
-    if (RingBuffer_Read(&Rb, &byte) == BUFFER_OK)
+    if (RingBuffer_Read(&Rb, &byte) == RINGBUFFER_OK)
     {
         Userial_Debug(huart,
                    "RX byte: 0x%02X | IRQ=%lu | OVF=%lu\r\n",

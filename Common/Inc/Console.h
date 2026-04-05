@@ -1,7 +1,7 @@
 #ifndef USERIAL_H_
 #define USERIAL_H_
 
-#include <stdbool.h>
+#include "Common_Defines.h"
 #include "Usart.h"
 #include "USerial.h"
 
