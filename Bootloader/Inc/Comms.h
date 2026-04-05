@@ -4,6 +4,8 @@
 #include "Common_Defines.h"
 
 #define PACKET_DATA_LENGTH    (16)
+#define PACKET_LENGTH         (1)
+#define PACKET_CRC_LENGTH         (1)
 
 typedef struct
 {
