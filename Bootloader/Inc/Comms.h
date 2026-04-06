@@ -17,6 +17,7 @@ typedef struct
     uint8_t crc;
 } Comms_Packet_t;
 
+// TODO: Provide an interface for the transport handle instead of directly using USART_Handle
 void Comms_Setup(void);
 void Comms_Update(USART_Handle *USARTx);
 bool Comms_Packets_Available(void);
