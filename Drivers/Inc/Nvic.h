@@ -1,7 +1,8 @@
 #ifndef NVIC_H_
 #define NVIC_H_
 
-typedef enum {
+typedef enum
+{
     USART1_IRQn = 37,
     USART2_IRQn = 38
 } IRQn_Type_t;

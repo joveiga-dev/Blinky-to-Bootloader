@@ -14,6 +14,7 @@ We need to have the following installed and and added to the correct environment
     - Verify installation using this prompt-> arm-none-eabi-gcc --version
 - [GNU Make](https://www.gnu.org/software/make/)
 - [OpenOCD debug tool](https://github.com/xpack-dev-tools/openocd-xpack/releases)
+- [GDB]
 
 ## Nucleo-Board
 

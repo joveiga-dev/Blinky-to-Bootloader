@@ -10,7 +10,9 @@ SIZE = $(TC)size
 
 # CPU and architecture flags
 CPU = -mcpu=cortex-m4
-FLOAT=-mfloat-abi=soft
+FLOAT = -mfloat-abi=hard -mfpu=fpv4-sp-d16 -u _printf_float
+
+BOOT_START = 0x08000000
 
 #--------------------------------------------------------------------
 # Target
@@ -33,7 +35,7 @@ MAP_FILE = -Wl,-Map=$(BUILD_DIR)/$(MAP)
 CFLAGS = $(CPU)
 CFLAGS += -mthumb $(FLOAT)
 CFLAGS += -Wall -Wextra -Werror
-CFLAGS += -O0 -g 
+CFLAGS += -Os
 CFLAGS += -ffreestanding -nostdlib -nostartfiles
 CFLAGS += -fno-common -ffunction-sections -fdata-sections
 
@@ -54,7 +56,7 @@ INCLUDES += -I$(ROOT_DIR)/Common/Inc
 BOOT_SRC := $(wildcard $(ROOT_DIR)/Bootloader/Src/*.c)
 DRIVERS_SRC := $(wildcard $(ROOT_DIR)/Drivers/Src/*.c)
 COMMON_SRC := $(wildcard $(ROOT_DIR)/Common/Src/*.c)
-STARTUP_SRC := $(wildcard $(ROOT_DIR)/Linkers/*.c)
+STARTUP_SRC := $(wildcard $(ROOT_DIR)/Startup/*.c)
 
 SOURCES := $(BOOT_SRC) $(STARTUP_SRC) $(DRIVERS_SRC) $(COMMON_SRC)
 
@@ -66,7 +68,7 @@ OBJECTS := $(patsubst $(ROOT_DIR)/%, $(BUILD_DIR)/%, $(SOURCES:.c=.o))
 #---------------------------------------------------------------------------------
 # Default target
 #---------------------------------------------------------------------------------
-all: $(BUILD_DIR)/$(TARGET) $(BUILD_DIR)/$(BIN) size
+all: $(BUILD_DIR)/$(TARGET) $(BUILD_DIR)/$(BIN)
 
 
 # Ensure build directories exist
@@ -87,10 +89,6 @@ $(BUILD_DIR)/%.o: $(ROOT_DIR)/%.c | $(BUILD_DIR)
 $(BUILD_DIR)/$(TARGET): $(OBJECTS) | $(BUILD_DIR)
 	@echo "Linking $@"
 	$(CC) $(LDFLAGS) -o $@ $^
-#	@echo "Generating BIN"
-#	$(OBJCOPY) -O binary $@ $(BUILD_DIR)/$(BIN)
-#	@echo "Size:"
-#	$(SIZE) $@
 
 #----------------------------------------------------------------------
 # BIN
@@ -98,36 +96,22 @@ $(BUILD_DIR)/$(TARGET): $(OBJECTS) | $(BUILD_DIR)
 $(BUILD_DIR)/$(BIN): $(BUILD_DIR)/$(TARGET)
 	@echo "Generating BIN"
 	$(OBJCOPY) -O binary $< $@
-	python3 pad_bootloader.py
-
-size: $(BUILD_DIR)/$(TARGET)
-	@echo ""
-	@echo "=== Size Information ==="
-	@$(SIZE) $<
-	@echo ""
-	@echo "=== Memory Usage ==="
-	@SIZE=$$($(SIZE) -B $< | tail -1 | awk '{print $$1+$$2}'); \
-	echo "Total (text+data): $$SIZE bytes"; \
-	echo "Available SRAM: 65536 bytes (64KB)"; \
-	PERCENT=$$(echo "scale=1; $$SIZE * 100 / 65536" | bc); \
-	echo "Usage: $$PERCENT%"
+#	python3 pad_bootloader.py
 
 # ---------------------------------------------------------------------
 # Flashing targets
 # ---------------------------------------------------------------------
 flash:
-	$(STM32PROGRAMMER_CLI) -c port=SWD mode=UR -w $(BUILD_DIR)/$(PROJECT).bin 0x08000000 -rst
+	$(STM32PROGRAMMER_CLI) -c port=SWD mode=UR -w $(BUILD_DIR)/$(TARGET) $(BOOT_START) -v -rst
 
 dfu:
-	dfu-util -a 0 -s 0x08000000:leave -D $(BUILD_DIR)/$(PROJECT).bin
+	dfu-util -a 0 -s $(BOOT_START):leave -D $(BUILD_DIR)/$(BIN) $(BOOT_START)
 
 # ---------------------------------------------------------------------
 # Clean
 # ---------------------------------------------------------------------
 clean:
 	@echo "Cleaning build directory..."
-	@rm -rf $(BUILD_DIR)/*.o $(BUILD_DIR)/*.elf $(BUILD_DIR)/*.bin $(BUILD_DIR)/*.map
-	@echo "Deleting all"
 	@rm -rf $(BUILD_DIR)
 
-.PHONY: all clean size flash dfu 
+.PHONY: all clean flash dfu 

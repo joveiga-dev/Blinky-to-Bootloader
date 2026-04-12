@@ -33,6 +33,7 @@ void Userial_Init(USART_Handle *Husart);
 void Userial_SendByte(USART_Handle *Husart, uint8_t data);
 void Userial_SendData(USART_Handle *Husart, const uint8_t *data, uint32_t len);
 void Userial_SendString(USART_Handle *Husart, const char *data);
+void Userial_SendArray(USART_Handle *Husart, const uint8_t *data, uint32_t len);
 uint32_t Userial_ReceiveData(uint8_t *data, uint32_t len);
 uint8_t Userial_ReceiveByte(void);
 void Userial_PollReceive(USART_Handle *Husart);

@@ -190,7 +190,7 @@ bool Comms_Packets_Available(void)
  * @param Packet Pointer to the packet to be sent
  *  @return void
  */
-void Comms_Send(USART_Handle *USARTx, const Comms_Packet_t *Packet)
+void Comms_Send(USART_Handle *USARTx, Comms_Packet_t *Packet)
 {
     if (USARTx == NULL || Packet == NULL)
     {
@@ -198,13 +198,14 @@ void Comms_Send(USART_Handle *USARTx, const Comms_Packet_t *Packet)
     }
 
     Userial_SendData(USARTx, (uint8_t *)Packet, PACKET_LENGTH_MAX);
+    Comms_Packet_Copy(&ReTx_last_Packet, Packet);
 }
 
 /**
  * @brief Receives a packet from the communication interface
  * @param Packet Pointer to the packet structure where received data will be stored
  */
-void Comms_Receive(USART_Handle *USARTx, const Comms_Packet_t *Packet)
+void Comms_Receive(USART_Handle *USARTx, Comms_Packet_t *Packet)
 {
     if (USARTx == NULL || Packet == NULL)
     {
@@ -222,5 +223,5 @@ void Comms_Receive(USART_Handle *USARTx, const Comms_Packet_t *Packet)
  */
 uint8_t Comms_Compute_CRC(Comms_Packet_t *Packet)
 {
-    return Crc8_Compute((uint8_t *)&Packet, PACKET_DATA_LENGTH + PACKET_LENGTH_BYTES);
+    return Crc8_Compute((uint8_t *)Packet, PACKET_DATA_LENGTH + PACKET_LENGTH_BYTES);
 }

@@ -9,12 +9,13 @@ OBJDUMP = $(TC)objdump
 SIZE = $(TC)size
 
 # CPU and architecture flags
-CPU = -mcpu=cortex-m4
-FLOAT=-mfloat-abi=soft
+CPU   = -mcpu=cortex-m4
+FLOAT = -mfloat-abi=hard -mfpu=fpv4-sp-d16
 
-# Constants for flashing
-BOOT_SIZE = 0x08000000
-
+#--------------------------------------------------------------------------------
+# APP MEMORY CONFIG
+#--------------------------------------------------------------------------------
+APP_START = 0x08008000
 #--------------------------------------------------------------------
 # Target
 #-------------------------------------------------------------------
@@ -30,19 +31,32 @@ STM32PROGRAMMER_CLI = "/mnt/c/Program Files (x86)/STMicroelectronics/STM32Cube/S
 LINKER = -T $(ROOT_DIR)/Linkers/STM32L476RG_App.ld
 MAP_FILE = -Wl,-Map=$(BUILD_DIR)/$(MAP)
 
+#--------------------------------------------------------------------------------
+# DEFINES
+#--------------------------------------------------------------------------------
+DEFINES = -DAPP_START=$(APP_START)
+
 #-------------------------------------------------------------------
 # Flags
 #------------------------------------------------------------------
-CFLAGS = $(CPU)
+CFLAGS  = $(CPU)
 CFLAGS += -mthumb $(FLOAT)
 CFLAGS += -Wall -Wextra -Werror
-CFLAGS += -O0 -g 
+CFLAGS += -O0 -g
 CFLAGS += -ffreestanding -nostdlib -nostartfiles
 CFLAGS += -fno-common -ffunction-sections -fdata-sections
+#CFLAGS += $(DEFINES)
 
-LDFLAGS =  $(CPU) -mthumb $(FLOAT) --specs=nosys.specs  $(LINKER) $(MAP_FILE) -g \
-			-Wl,--gc-sections -static --specs=nano.specs -Wl,--start-group -lc -lm -Wl,--end-group \
- 			-Wl,--print-memory-usage
+LDFLAGS = $(CPU) -mthumb $(FLOAT)
+LDFLAGS += --specs=nosys.specs
+LDFLAGS += $(LINKER)
+LDFLAGS += $(MAP_FILE)
+LDFLAGS += -g
+LDFLAGS += -Wl,--gc-sections
+LDFLAGS += -static
+LDFLAGS += --specs=nano.specs
+LDFLAGS += -Wl,--start-group -lc -lm -Wl,--end-group
+LDFLAGS += -Wl,--print-memory-usage
 
 #-----------------------------------------------
 # Inludes
@@ -55,17 +69,15 @@ INCLUDES += -I$(ROOT_DIR)/Common/Inc
 # Source Files discovery recursively
 #-----------------------------------
 APP_SRC_C    := $(wildcard $(ROOT_DIR)/App/Src/*.c)
-APP_SRC_S    := $(wildcard $(ROOT_DIR)/App/Src/*.S)
+#APP_SRC_S    := $(wildcard $(ROOT_DIR)/App/Src/*.S)
 DRIVERS_SRC  := $(wildcard $(ROOT_DIR)/Drivers/Src/*.c)
 COMMON_SRC   := $(wildcard $(ROOT_DIR)/Common/Src/*.c)
-STARTUP_SRC  := $(wildcard $(ROOT_DIR)/Linkers/*.c)
-SOURCES      := $(APP_SRC_C) $(APP_SRC_S) $(STARTUP_SRC) $(DRIVERS_SRC) $(COMMON_SRC)
+STARTUP_SRC  := $(wildcard $(ROOT_DIR)/Startup/*.c)
+SOURCES      := $(APP_SRC_C) $(STARTUP_SRC) $(DRIVERS_SRC) $(COMMON_SRC)
 
 #---------------------------------------------------------------------------------
 # Object files (mirrored into Build)
 #---------------------------------------------------------------------------------
-#OBJECTS      := $(patsubst $(ROOT_DIR)/%, $(BUILD_DIR)/%, $(SOURCES:.c=.o))
-#OBJECTS      += $(patsubst $(ROOT_DIR)/%, $(BUILD_DIR)/%, $(SOURCES:.S=.o))
 
 OBJECTS := $(patsubst $(ROOT_DIR)/%.c,$(BUILD_DIR)/%.o,$(filter %.c,$(SOURCES)))
 OBJECTS += $(patsubst $(ROOT_DIR)/%.S,$(BUILD_DIR)/%.o,$(filter %.S,$(SOURCES)))
@@ -73,7 +85,7 @@ OBJECTS += $(patsubst $(ROOT_DIR)/%.S,$(BUILD_DIR)/%.o,$(filter %.S,$(SOURCES)))
 #---------------------------------------------------------------------------------
 # Default target
 #---------------------------------------------------------------------------------
-all: $(BUILD_DIR)/$(TARGET) $(BUILD_DIR)/$(BIN) size
+all: $(BUILD_DIR)/$(TARGET) $(BUILD_DIR)/$(BIN)
 
 
 # Ensure build directories exist
@@ -87,14 +99,16 @@ $(BUILD_DIR)/%.o: $(ROOT_DIR)/%.c | $(BUILD_DIR)
 	@mkdir -p $(dir $@)
 	@echo "Compiling $<"
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+	@echo 'Finished compiling $<'
+	@echo '-----------------------------------'
 
 #----------------------------------------------------------------------------
 # Compile rules (S)
 #---------------------------------------------------------------------------
-$(BUILD_DIR)/%.o: $(ROOT_DIR)/%.S | $(BUILD_DIR)
-	@mkdir -p $(dir $@)
-	@echo "Assembling $<"
-	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+#$(BUILD_DIR)/%.o: $(ROOT_DIR)/%.S | $(BUILD_DIR)
+#	@mkdir -p $(dir $@)
+#	@echo "Assembling $<"
+#	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
 # ---------------------------------------------------------------------
 # Linking
@@ -102,6 +116,8 @@ $(BUILD_DIR)/%.o: $(ROOT_DIR)/%.S | $(BUILD_DIR)
 $(BUILD_DIR)/$(TARGET): $(OBJECTS) | $(BUILD_DIR)
 	@echo "Linking $@"
 	$(CC) $(LDFLAGS) -o $@ $^
+	@echo 'Finished linking $@'
+	@echo '-----------------------------------'
 
 #----------------------------------------------------------------------
 # BIN
@@ -110,34 +126,21 @@ $(BUILD_DIR)/$(BIN): $(BUILD_DIR)/$(TARGET)
 	@echo "Generating BIN"
 	$(OBJCOPY) -O binary $< $@
 
-size: $(BUILD_DIR)/$(TARGET)
-	@echo ""
-	@echo "=== Size Information ==="
-	@$(SIZE) $<
-	@echo ""
-	@echo "=== Memory Usage ==="
-	@SIZE=$$($(SIZE) -B $< | tail -1 | awk '{print $$1+$$2}'); \
-	echo "Total (text+data): $$SIZE bytes"; \
-	echo "Available SRAM: 65536 bytes (64KB)"; \
-	PERCENT=$$(echo "scale=1; $$SIZE * 100 / 65536" | bc); \
-	echo "Usage: $$PERCENT%"
 
 # ---------------------------------------------------------------------
 # Flashing targets
 # ---------------------------------------------------------------------
-flash:
-	$(STM32PROGRAMMER_CLI) -c port=SWD mode=UR -w $(BUILD_DIR)/$(PROJECT).bin 0x08000000 -v -rst
+flash: $(BUILD_DIR)/$(BIN)
+	$(STM32PROGRAMMER_CLI) -c port=SWD mode=UR -w $(BUILD_DIR)/$(TARGET) $(APP_START) -v -rst
 
 dfu:
-	dfu-util -a 0 -s 0x08000000:leave -D $(BUILD_DIR)/$(PROJECT).bin
+	dfu-util -a 0 -s $(APP_START):leave -D $(BUILD_DIR)/$(BIN)
 
 # ---------------------------------------------------------------------
 # Clean
 # ---------------------------------------------------------------------
 clean:
 	@echo "Cleaning build directory..."
-	@rm -rf $(BUILD_DIR)/*.o $(BUILD_DIR)/*.elf $(BUILD_DIR)/*.bin $(BUILD_DIR)/*.map
-	@echo "Deleting all"
 	@rm -rf $(BUILD_DIR)
 
-.PHONY: all clean size flash dfu 
+.PHONY: all clean flash dfu 

@@ -15,9 +15,11 @@ ENTRY(Reset_Handler)
 
 MEMORY
 {
-    FLASH (rx) : ORIGIN = 0x08000000, LENGTH = 1024K
+    FLASH (rx) : ORIGIN = 0x08008000, LENGTH = 992K   /* 1024 - 32 KB for bootloader */
     SRAM  (rwx): ORIGIN = 0x20000000, LENGTH = 96K
 }
+
+_estack = ORIGIN(SRAM) + LENGTH(SRAM);
 
 /* Sections */
 SECTIONS
@@ -29,12 +31,8 @@ SECTIONS
     .text :
     {   
         . = ALIGN(4);
-        KEEP(*(.bootloader_section))
+        KEEP(*(.isr_vector))  /* Interrupt vector table */
         . = ALIGN(4);
-        KEEP(*(.vectors))
-        . = ALIGN(4);
-
-
         *(.text*)     /* Program code */
         *(.rodata*)   /* Ready-only data*/
         . = ALIGN(4);
@@ -45,11 +43,14 @@ SECTIONS
     * During boot, we have to copy from flash to ram at the provided locations.
     * _sdata and _edata will be used for that
     */
+    _sidata = LOADADDR(.data);
+
     .data : /* AT (_etext) */
     {   
         . = ALIGN(4);
         _sdata = .;   /* Create a global symbol at data start*/
         *(.data*)
+        *(.data)
         . = ALIGN(4);
         _edata = .;  /* Create a global symbol at data end*/
     } > SRAM AT > FLASH

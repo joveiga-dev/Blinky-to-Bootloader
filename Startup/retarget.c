@@ -3,7 +3,7 @@
 extern USART_Handle huart2;
 
 int _write(int file, char *ptr, int len)
-{   
+{
     (void)file;
     for (int i = 0; i < len; i++)
     {
@@ -12,7 +12,6 @@ int _write(int file, char *ptr, int len)
 
     return len;
 }
-
 
 int _read(int file, char *ptr, int len)
 {
@@ -36,11 +35,10 @@ int _lseek(int file, int ptr, int dir)
     return 0;
 }
 
-
-extern char _end;   // from linker script
+extern char _end; // from linker script
 static char *heap_end;
 
-void * _sbrk(int incr)
+void *_sbrk(int incr)
 {
     char *prev_heap;
 

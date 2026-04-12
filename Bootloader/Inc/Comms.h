@@ -2,6 +2,7 @@
 #define COMMS_H
 
 #include "Common_Defines.h"
+#include "USerial.h"
 
 #define PACKET_DATA_LENGTH (16)
 #define PACKET_LENGTH_BYTES (1)
@@ -21,8 +22,8 @@ typedef struct
 void Comms_Setup(void);
 void Comms_Update(USART_Handle *USARTx);
 bool Comms_Packets_Available(void);
-void Comms_Send(USART_Handle *USARTx, const Comms_Packet_t *Packet);    // Write
-void Comms_Receive(USART_Handle *USARTx, const Comms_Packet_t *Packet); // Read
+void Comms_Send(USART_Handle *USARTx, Comms_Packet_t *Packet);    // Write
+void Comms_Receive(USART_Handle *USARTx, Comms_Packet_t *Packet); // Read
 uint8_t Comms_Compute_CRC(Comms_Packet_t *Packet);
 
 #endif // COMMS_H

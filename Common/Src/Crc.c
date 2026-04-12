@@ -1,5 +1,5 @@
 #include "Crc.h"
-
+#include "USerial.h"
 /**
  * Compute the CRC-8 checksum for the given data and length.
  */

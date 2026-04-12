@@ -1,15 +1,3 @@
-/*
-********************************************************
-Author: jveiga1998@outlook.com
-Date: 06-02-2026
-@file       : linker.ld
-@brief      : Linker Script for STM32L476RG Device
-                1024KBytes FLASH
-                96KBytes RAM
-                32KBytes SRAM2
-*********************************************************
-*/
-
 
 /* Define the Entry Point of the output file. */
 ENTRY(Reset_Handler)
@@ -33,16 +21,12 @@ SECTIONS
     .text :
     {   
         . = ALIGN(4);
-        KEEP(*(.vectors))
+        KEEP(*(.isr_vector))  /* Interrupt vector table */
         . = ALIGN(4);
         *(.text*)     /* Program code */
-        *(.text.*)
         *(.rodata*)   /* Ready-only data*/
-        *(.rodata.*)
-
         . = ALIGN(4);
         _etext = .;   /* Define a gloabl symbol at the end of code section */
-
     } > FLASH
 
     _sidata = LOADADDR(.data);
@@ -55,7 +39,6 @@ SECTIONS
     {   
         . = ALIGN(4);
         _sdata = .;   /* Create a global symbol at data start*/
-        *(.data)
         *(.data*)
 
         . = ALIGN(4);
@@ -66,7 +49,6 @@ SECTIONS
     {
         . = ALIGN(4);
         _sbss = .;
-        *(.bss)
         *(.bss*)     /* Define a global symbol at bss start*/
         *(COMMON)
 
@@ -75,6 +57,9 @@ SECTIONS
     } > SRAM
 
     _end = .; 
+
+    _boot_end  = ORIGIN(FLASH) + LENGTH(FLASH);
+    _boot_size = LENGTH(FLASH);
    
         
 }

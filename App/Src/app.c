@@ -8,13 +8,12 @@
 #include "Led_fsm.h"
 #include "USerial.h"
 
-#define BOOTLOADER_SIZE (0x8000U)
-
+/**/
 USART_Handle huart2;
 
-static void Vector_Setup(void)
+static void Allocate_VectorTable(void)
 {
-    SCB_VTOR = BOOTLOADER_SIZE;
+    SCB_VTOR = 0x00008000U;
 }
 
 /**
@@ -41,7 +40,7 @@ void Usart2_Init(void)
 
     Userial_Init(&huart2);
 
-    Userial_SendString(&huart2, "USART Ready\r\n");
+    // Userial_SendString(&huart2, "USART Ready\r\n");
 }
 
 /**
@@ -49,14 +48,14 @@ void Usart2_Init(void)
  */
 void App_Init(void)
 {
-    Vector_Setup();
+    Allocate_VectorTable();
     Led_InitAllLeds();
     Btn_Init(BTN1);
     SysTick_Init(SYSTICK_LOAD_1MS);
     LedFsm_Init();
     Usart2_Init();
 
-    Userial_SendString(&huart2, "App INIT\r\n");
+    // Userial_SendString(&huart2, "App INIT\r\n");
 }
 
 static void Led_Task(void)
